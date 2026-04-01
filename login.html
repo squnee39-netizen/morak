@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모락 - 로그인</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { background: var(--cream); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+    .login-box {
+      background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+      padding: 48px 40px; width: 100%; max-width: 420px;
+    }
+    .login-logo { text-align: center; margin-bottom: 32px; }
+    .login-logo .steam { color: var(--orange); font-size: 2rem; }
+    .login-logo h1 { font-size: 1.8rem; font-weight: 800; color: var(--charcoal); }
+    .login-logo p { color: var(--gray-400); font-size: 0.9rem; margin-top: 4px; }
+    .tab-bar { display: flex; border-bottom: 2px solid var(--gray-100); margin-bottom: 28px; }
+    .tab-btn {
+      flex: 1; padding: 12px; text-align: center; font-weight: 600;
+      font-size: 0.95rem; color: var(--gray-400); cursor: pointer; border: none;
+      background: none; border-bottom: 2px solid transparent; margin-bottom: -2px;
+      transition: var(--transition);
+    }
+    .tab-btn.active { color: var(--orange); border-bottom-color: var(--orange); }
+    .form-panel { display: none; }
+    .form-panel.active { display: block; }
+    .error-msg {
+      background: #FEF2F2; color: #DC2626; border-radius: var(--radius-sm);
+      padding: 12px 16px; font-size: 0.85rem; margin-bottom: 16px; display: none;
+    }
+    .success-msg {
+      background: #F0FDF4; color: #16A34A; border-radius: var(--radius-sm);
+      padding: 12px 16px; font-size: 0.85rem; margin-bottom: 16px; display: none;
+    }
+    .divider { text-align: center; color: var(--gray-300); font-size: 0.8rem; margin: 20px 0; position: relative; }
+    .divider::before, .divider::after {
+      content: ''; position: absolute; top: 50%; width: 42%; height: 1px; background: var(--gray-100);
+    }
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+    .role-notice {
+      background: var(--light-beige); border-radius: var(--radius-sm);
+      padding: 12px 16px; font-size: 0.82rem; color: var(--gray-500); margin-top: 16px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="steam">~</div>
+      <h1>모락</h1>
+      <p>포항 단체주문 & 정기구독 플랫폼</p>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('login', this)">로그인</button>
+      <button class="tab-btn" onclick="switchTab('signup', this)">회원가입</button>
+    </div>
+
+    <!-- 로그인 -->
+    <div class="form-panel active" id="panel-login">
+      <div class="error-msg" id="loginError"></div>
+      <div class="form-group">
+        <label class="form-label">이메일</label>
+        <input class="form-input" type="email" id="loginEmail" placeholder="email@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">비밀번호</label>
+        <input class="form-input" type="password" id="loginPassword" placeholder="비밀번호 입력">
+      </div>
+      <button class="btn btn-primary btn-full mt-16" onclick="login()" id="loginBtn">로그인</button>
+    </div>
+
+    <!-- 회원가입 -->
+    <div class="form-panel" id="panel-signup">
+      <div class="error-msg" id="signupError"></div>
+      <div class="success-msg" id="signupSuccess"></div>
+      <div class="form-group">
+        <label class="form-label">이메일</label>
+        <input class="form-input" type="email" id="signupEmail" placeholder="email@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">비밀번호</label>
+        <input class="form-input" type="password" id="signupPassword" placeholder="8자 이상">
+      </div>
+      <div class="form-group">
+        <label class="form-label">이름</label>
+        <input class="form-input" id="signupName" placeholder="홍길동">
+      </div>
+      <button class="btn btn-primary btn-full mt-16" onclick="signup()" id="signupBtn">회원가입</button>
+      <div class="role-notice">
+        💡 <strong>사장님이신가요?</strong> 일반 회원가입 후 입점 신청을 완료하시면 관리자 승인 후 사장님 페이지가 활성화됩니다.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://uocawtgzmxhveqpumnuc.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_KYRdizMFMdqxaIcpn_ubXA_EAOyszvC';
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // 이미 로그인된 경우 리다이렉트
+    sb.auth.getSession().then(({ data: { session } }) => {
+      if (session) redirectByRole(session.access_token);
+    });
+
+    function switchTab(tab, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + tab).classList.add('active');
+    }
+
+    async function redirectByRole(token) {
+      const { data } = await sb.from('user_profiles').select('role, store_id').single();
+      const role = data?.role || 'customer';
+      if (role === 'admin') location.href = '/admin';
+      else if (role === 'store_owner') location.href = '/store';
+      else location.href = '/customer';
+    }
+
+    async function login() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginBtn');
+      const err = document.getElementById('loginError');
+      err.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = '로그인 중...';
+
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) {
+        err.textContent = '이메일 또는 비밀번호가 올바르지 않습니다.';
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = '로그인';
+        return;
+      }
+      await redirectByRole(data.session.access_token);
+    }
+
+    async function signup() {
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPassword').value;
+      const name = document.getElementById('signupName').value.trim();
+      const btn = document.getElementById('signupBtn');
+      const err = document.getElementById('signupError');
+      const succ = document.getElementById('signupSuccess');
+      err.style.display = 'none';
+      succ.style.display = 'none';
+
+      if (!email || !password || !name) {
+        err.textContent = '모든 항목을 입력해주세요.';
+        err.style.display = 'block';
+        return;
+      }
+      if (password.length < 8) {
+        err.textContent = '비밀번호는 8자 이상이어야 합니다.';
+        err.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '가입 중...';
+
+      const { error } = await sb.auth.signUp({
+        email, password,
+        options: { data: { full_name: name } }
+      });
+
+      if (error) {
+        err.textContent = error.message.includes('already registered') ? '이미 가입된 이메일입니다.' : error.message;
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = '회원가입';
+        return;
+      }
+
+      succ.textContent = '✅ 가입 완료! 이메일 인증 후 로그인해주세요.';
+      succ.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = '회원가입';
+    }
+
+    // Enter 키 처리
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const panel = document.querySelector('.form-panel.active');
+        if (panel.id === 'panel-login') login();
+        else signup();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -6,6 +6,17 @@
   <title>모락 - 관리자</title>
   <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // 관리자 인증 가드 - 페이지 렌더 전 체크
+    (async () => {
+      const sb = supabase.createClient('https://uocawtgzmxhveqpumnuc.supabase.co','sb_publishable_KYRdizMFMdqxaIcpn_ubXA_EAOyszvC');
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { location.href = '/login'; return; }
+      const { data: profile } = await sb.from('user_profiles').select('role').eq('id', session.user.id).single();
+      if (!profile || profile.role !== 'admin') { location.href = '/login'; }
+    })();
+  </script>
   <style>
     body { padding-top: 64px; background: #0F0F0F; color: var(--gray-200); }
     .nav { background: rgba(15,15,15,0.95); border-bottom-color: #2A2A2A; }
@@ -149,6 +160,7 @@
       <div class="nav-links">
         <a href="index.html">홈</a>
         <a href="admin.html" class="active">관리자</a>
+        <a href="#" onclick="adminLogout()" class="btn btn-ghost btn-sm" style="color:var(--gray-400);">로그아웃</a>
       </div>
     </div>
   </nav>
@@ -386,6 +398,12 @@
   <script>
     const SUPABASE_URL = 'https://uocawtgzmxhveqpumnuc.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_KYRdizMFMdqxaIcpn_ubXA_EAOyszvC';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function adminLogout() {
+      await sb.auth.signOut();
+      location.href = '/login';
+    }
 
     let currentRejectId = null;
     let currentRejectName = '';

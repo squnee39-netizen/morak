@@ -6,6 +6,17 @@
   <title>모락 - 사장님 관리</title>
   <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // 사장님 인증 가드
+    (async () => {
+      const sb = supabase.createClient('https://uocawtgzmxhveqpumnuc.supabase.co','sb_publishable_KYRdizMFMdqxaIcpn_ubXA_EAOyszvC');
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { location.href = '/login'; return; }
+      const { data: profile } = await sb.from('user_profiles').select('role').eq('id', session.user.id).single();
+      if (!profile || (profile.role !== 'store_owner' && profile.role !== 'admin')) { location.href = '/login'; }
+    })();
+  </script>
   <style>
     body { padding-top: 64px; background: var(--dark); color: var(--gray-200); }
     .nav { background: rgba(26,26,26,0.95); border-bottom-color: var(--gray-700); }
@@ -148,6 +159,7 @@
       <div class="nav-links">
         <a href="index.html">홈</a>
         <a href="store.html" class="active">사장님 관리</a>
+        <a href="#" onclick="storeLogout()" class="btn btn-ghost btn-sm" style="color:var(--gray-400);">로그아웃</a>
       </div>
     </div>
   </nav>
@@ -631,6 +643,13 @@
   </div>
 
   <script>
+    const sb = supabase.createClient('https://uocawtgzmxhveqpumnuc.supabase.co','sb_publishable_KYRdizMFMdqxaIcpn_ubXA_EAOyszvC');
+
+    async function storeLogout() {
+      await sb.auth.signOut();
+      location.href = '/login';
+    }
+
     // Panel navigation
     function showPanel(name, btn) {
       document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
