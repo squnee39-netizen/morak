@@ -446,6 +446,47 @@
       document.getElementById('progressBar').style.display = 'none';
     }
 
+    // File upload preview
+    function initUpload(inputId, areaEl, maxFiles, label) {
+      const input = document.getElementById(inputId);
+      input.addEventListener('change', () => {
+        const files = Array.from(input.files).slice(0, maxFiles);
+        if (files.length === 0) return;
+
+        const isPdf = files.some(f => f.type === 'application/pdf');
+        if (isPdf) {
+          areaEl.innerHTML = `
+            <div class="upload-icon">📄</div>
+            <div class="upload-text" style="color:var(--charcoal);font-weight:600;">${files[0].name}</div>
+            <div class="upload-hint" style="color:var(--green);">✅ 업로드됨 · 클릭하여 변경</div>
+          `;
+          return;
+        }
+
+        const previews = files.map(f => new Promise(res => {
+          const reader = new FileReader();
+          reader.onload = e => res({ name: f.name, src: e.target.result });
+          reader.readAsDataURL(f);
+        }));
+
+        Promise.all(previews).then(imgs => {
+          areaEl.innerHTML = `
+            <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:8px;">
+              ${imgs.map(img => `<img src="${img.src}" style="height:80px;width:80px;object-fit:cover;border-radius:8px;border:1px solid var(--gray-100);">`).join('')}
+            </div>
+            <div class="upload-hint" style="color:var(--green);">✅ ${imgs.length}장 선택됨 · 클릭하여 변경</div>
+          `;
+        });
+      });
+    }
+
+    // Initialize upload areas
+    document.addEventListener('DOMContentLoaded', () => {
+      initUpload('photoInput',     document.querySelector('[onclick="document.getElementById(\'photoInput\').click()"]'),     3, '가게 대표 사진');
+      initUpload('menuPhotoInput', document.querySelector('[onclick="document.getElementById(\'menuPhotoInput\').click()"]'), 5, '메뉴 사진');
+      initUpload('licenseInput',   document.querySelector('[onclick="document.getElementById(\'licenseInput\').click()"]'),   1, '위생허가증');
+    });
+
     function addMenu() {
       const name = document.getElementById('newMenuName').value;
       const price = document.getElementById('newMenuPrice').value;
