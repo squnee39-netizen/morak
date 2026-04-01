@@ -46,6 +46,15 @@
       padding: 12px 16px; font-size: 0.82rem; color: var(--gray-500); margin-top: 16px;
       line-height: 1.6;
     }
+    .kakao-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 13px; border: none; border-radius: var(--radius-sm);
+      background: #FEE500; color: #191919; font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; font-family: inherit; transition: var(--transition);
+      margin-top: 12px;
+    }
+    .kakao-btn:hover { background: #F0D800; }
+    .kakao-icon { width: 20px; height: 20px; }
   </style>
 </head>
 <body>
@@ -73,6 +82,13 @@
         <input class="form-input" type="password" id="loginPassword" placeholder="비밀번호 입력">
       </div>
       <button class="btn btn-primary btn-full mt-16" onclick="login()" id="loginBtn">로그인</button>
+      <div class="divider">또는</div>
+      <button class="kakao-btn" onclick="kakaoLogin()">
+        <svg class="kakao-icon" viewBox="0 0 24 24" fill="#191919">
+          <path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.632 1.553 4.94 3.9 6.27l-.995 3.71a.375.375 0 0 0 .544.415L9.74 18.54A11.3 11.3 0 0 0 12 18c5.523 0 10-3.477 10-7.5S17.523 3 12 3z"/>
+        </svg>
+        카카오로 로그인
+      </button>
     </div>
 
     <!-- 회원가입 -->
@@ -114,6 +130,13 @@
       document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('panel-' + tab).classList.add('active');
+    }
+
+    async function kakaoLogin() {
+      await sb.auth.signInWithOAuth({
+        provider: 'kakao',
+        options: { redirectTo: window.location.origin + '/customer' }
+      });
     }
 
     async function redirectByRole(token) {
