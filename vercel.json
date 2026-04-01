@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "name": "morak",
+  "builds": [
+    {
+      "src": "**/*.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/customer", "dest": "/customer.html" },
+    { "src": "/store", "dest": "/store.html" },
+    { "src": "/store-register", "dest": "/store-register.html" },
+    { "src": "/admin", "dest": "/admin.html" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" }
+      ]
+    }
+  ]
+}

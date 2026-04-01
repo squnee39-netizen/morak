@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모락 - 입점 신청</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { padding-top: 64px; background: var(--cream); }
+    .register-wrapper {
+      max-width: 640px; margin: 0 auto; padding: 40px 24px 80px;
+    }
+    .register-header { text-align: center; margin-bottom: 40px; }
+    .register-header h1 { font-size: 2rem; }
+    .register-header p { margin-top: 8px; }
+
+    /* Progress Steps */
+    .progress-bar { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 40px; }
+    .progress-step {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .progress-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700;
+      background: var(--gray-200); color: var(--gray-400);
+      transition: var(--transition);
+    }
+    .progress-step.active .progress-num { background: var(--orange); color: white; }
+    .progress-step.done .progress-num { background: var(--green); color: white; }
+    .progress-label { font-size: 0.8rem; font-weight: 500; color: var(--gray-400); }
+    .progress-step.active .progress-label { color: var(--charcoal); font-weight: 600; }
+    .progress-step.done .progress-label { color: var(--green); }
+    .progress-line { width: 40px; height: 2px; background: var(--gray-200); margin: 0 8px; }
+    .progress-line.done { background: var(--green); }
+
+    /* Step content */
+    .step-content { display: none; }
+    .step-content.active { display: block; }
+
+    /* Area selection */
+    .area-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .area-chip {
+      padding: 10px 14px; border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm); text-align: center; cursor: pointer;
+      font-size: 0.85rem; font-weight: 500; transition: var(--transition);
+      background: var(--white);
+    }
+    .area-chip:hover { border-color: var(--orange); }
+    .area-chip.selected { border-color: var(--orange); background: rgba(232,115,42,0.08); color: var(--orange); font-weight: 600; }
+
+    /* Day chips */
+    .day-chips { display: flex; gap: 8px; }
+    .day-chip {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      border: 1.5px solid var(--gray-200); font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition); background: var(--white);
+    }
+    .day-chip:hover { border-color: var(--orange); }
+    .day-chip.selected { background: var(--orange); color: white; border-color: var(--orange); }
+
+    /* File upload */
+    .upload-area {
+      border: 2px dashed var(--gray-200); border-radius: var(--radius-md);
+      padding: 40px; text-align: center; cursor: pointer;
+      transition: var(--transition); background: var(--white);
+    }
+    .upload-area:hover { border-color: var(--orange); background: rgba(232,115,42,0.03); }
+    .upload-icon { font-size: 2.5rem; margin-bottom: 8px; }
+    .upload-text { font-size: 0.9rem; color: var(--gray-500); }
+    .upload-hint { font-size: 0.8rem; color: var(--gray-400); margin-top: 4px; }
+
+    /* Navigation buttons */
+    .step-nav { display: flex; gap: 12px; margin-top: 32px; }
+
+    /* Completion */
+    .complete-section {
+      text-align: center; padding: 60px 0;
+    }
+    .complete-icon { font-size: 4rem; margin-bottom: 20px; }
+    .complete-status {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 20px; border-radius: 20px;
+      background: var(--yellow-light); color: var(--yellow);
+      font-weight: 600; font-size: 0.9rem; margin-top: 16px;
+    }
+    .complete-info {
+      background: var(--white); border-radius: var(--radius-lg);
+      padding: 24px; margin-top: 32px; text-align: left;
+      border: 1px solid var(--gray-100);
+    }
+    .complete-info-row {
+      display: flex; justify-content: space-between; padding: 8px 0;
+      font-size: 0.9rem; border-bottom: 1px solid var(--gray-100);
+    }
+    .complete-info-row:last-child { border-bottom: none; }
+    .complete-info-label { color: var(--gray-400); }
+    .complete-info-value { font-weight: 600; color: var(--charcoal); }
+
+    /* Menu items */
+    .menu-item {
+      display: flex; gap: 12px; align-items: center;
+      padding: 12px; background: var(--light-beige); border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+    }
+    .menu-item-info { flex: 1; }
+    .menu-item-name { font-weight: 600; font-size: 0.9rem; }
+    .menu-item-price { font-size: 0.8rem; color: var(--gray-500); }
+    .menu-remove {
+      width: 28px; height: 28px; border-radius: 50%; border: none;
+      background: var(--red-light); color: var(--red); cursor: pointer;
+      font-size: 0.9rem; display: flex; align-items: center; justify-content: center;
+    }
+
+    @media (max-width: 768px) {
+      .area-grid { grid-template-columns: repeat(2, 1fr); }
+      .progress-label { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Nav -->
+  <nav class="nav scrolled">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo"><span class="steam">~</span> 모락</a>
+      <div class="nav-links">
+        <a href="index.html">홈</a>
+        <a href="customer.html">주문하기</a>
+        <a href="store-register.html" class="active">입점 신청</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="register-wrapper">
+    <div class="register-header">
+      <h1>&#127978; 입점 신청</h1>
+      <p>모락에 상점을 등록하고 새로운 고객을 만나세요</p>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar">
+      <div class="progress-step active" data-step="1">
+        <div class="progress-num">1</div>
+        <span class="progress-label">기본 정보</span>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="2">
+        <div class="progress-num">2</div>
+        <span class="progress-label">메뉴 & 배달</span>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="3">
+        <div class="progress-num">3</div>
+        <span class="progress-label">소개 & 사진</span>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="4">
+        <div class="progress-num">4</div>
+        <span class="progress-label">확인 & 제출</span>
+      </div>
+    </div>
+
+    <!-- Step 1: 기본 정보 -->
+    <div class="step-content active" id="step-1">
+      <div class="card card-elevated" style="padding:32px;">
+        <h3 style="margin-bottom:24px;">&#128203; 기본 정보</h3>
+        <div class="form-group">
+          <label class="form-label">상호명 *</label>
+          <input class="form-input" placeholder="예: 남구분식당" id="storeName" value="포항건강도시락">
+        </div>
+        <div class="form-group">
+          <label class="form-label">사업자등록번호 *</label>
+          <input class="form-input" placeholder="000-00-00000" value="123-45-67890">
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">대표자명 *</label>
+            <input class="form-input" placeholder="홍길동" value="김사장">
+          </div>
+          <div class="form-group">
+            <label class="form-label">연락처 *</label>
+            <input class="form-input" placeholder="010-0000-0000" value="010-9876-5432">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">이메일</label>
+          <input class="form-input" type="email" placeholder="email@example.com" value="healthy@pohang.kr">
+        </div>
+        <div class="form-group">
+          <label class="form-label">가게 주소 *</label>
+          <input class="form-input" placeholder="포항시 남구 ..." value="포항시 남구 효자동 456-7">
+        </div>
+        <div class="form-group">
+          <label class="form-label">업종 카테고리 *</label>
+          <select class="form-select">
+            <option>케이터링</option>
+            <option>한식</option>
+            <option>커피/디저트</option>
+            <option>도시락</option>
+            <option>분식</option>
+            <option>피자&치킨</option>
+            <option>패스트푸드</option>
+          </select>
+        </div>
+        <div class="step-nav">
+          <button class="btn btn-primary btn-lg btn-full" onclick="goStep(2)">다음 단계 &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: 메뉴 & 배달 -->
+    <div class="step-content" id="step-2">
+      <div class="card card-elevated" style="padding:32px;">
+        <h3 style="margin-bottom:24px;">&#127860; 메뉴 & 배달 설정</h3>
+
+        <!-- Menu registration -->
+        <h4 style="margin-bottom:12px;">대표 메뉴 등록</h4>
+        <div id="menuList">
+          <div class="menu-item">
+            <div class="menu-item-info">
+              <div class="menu-item-name">건강 도시락</div>
+              <div class="menu-item-price">6,500원 / 1인</div>
+            </div>
+            <button class="menu-remove" onclick="this.parentElement.remove()">&times;</button>
+          </div>
+          <div class="menu-item">
+            <div class="menu-item-info">
+              <div class="menu-item-name">저염 도시락</div>
+              <div class="menu-item-price">7,000원 / 1인</div>
+            </div>
+            <button class="menu-remove" onclick="this.parentElement.remove()">&times;</button>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:12px;">
+          <input class="form-input" placeholder="메뉴명" id="newMenuName">
+          <input class="form-input" placeholder="가격 (원)" id="newMenuPrice" type="number">
+        </div>
+        <button class="btn btn-secondary btn-sm mt-8" onclick="addMenu()">+ 메뉴 추가</button>
+
+        <div class="divider"></div>
+
+        <!-- Service type -->
+        <h4 style="margin-bottom:12px;">서비스 유형</h4>
+        <div class="chip-group">
+          <button class="chip active" onclick="this.classList.toggle('active')">&#128230; 단체주문</button>
+          <button class="chip active" onclick="this.classList.toggle('active')">&#128260; 정기구독</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Delivery area -->
+        <h4 style="margin-bottom:12px;">배달 가능 지역 *</h4>
+        <div class="area-grid">
+          <div class="area-chip selected" onclick="this.classList.toggle('selected')">남구</div>
+          <div class="area-chip" onclick="this.classList.toggle('selected')">북구</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Delivery days -->
+        <h4 style="margin-bottom:12px;">배달 가능 요일</h4>
+        <div class="day-chips">
+          <div class="day-chip selected" onclick="this.classList.toggle('selected')">월</div>
+          <div class="day-chip selected" onclick="this.classList.toggle('selected')">화</div>
+          <div class="day-chip selected" onclick="this.classList.toggle('selected')">수</div>
+          <div class="day-chip selected" onclick="this.classList.toggle('selected')">목</div>
+          <div class="day-chip selected" onclick="this.classList.toggle('selected')">금</div>
+          <div class="day-chip" onclick="this.classList.toggle('selected')">토</div>
+          <div class="day-chip" onclick="this.classList.toggle('selected')">일</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Delivery method -->
+        <h4 style="margin-bottom:12px;">배달 방식</h4>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="area-chip selected" style="text-align:left;display:flex;align-items:center;gap:10px;" onclick="this.classList.toggle('selected')">
+            &#128666; 직접 배달
+          </div>
+          <div class="area-chip" style="text-align:left;display:flex;align-items:center;gap:10px;" onclick="this.classList.toggle('selected')">
+            &#128690; 퀵 배달 (바로고/생각대로)
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="form-group">
+            <label class="form-label">배달비</label>
+            <input class="form-input" type="number" value="3000" placeholder="원">
+          </div>
+          <div class="form-group">
+            <label class="form-label">최소 주문 인원</label>
+            <input class="form-input" type="number" value="5" placeholder="명">
+          </div>
+        </div>
+
+        <div class="step-nav">
+          <button class="btn btn-secondary btn-lg" onclick="goStep(1)">&larr; 이전</button>
+          <button class="btn btn-primary btn-lg btn-full" onclick="goStep(3)">다음 단계 &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: 소개 & 사진 -->
+    <div class="step-content" id="step-3">
+      <div class="card card-elevated" style="padding:32px;">
+        <h3 style="margin-bottom:24px;">&#128247; 소개 & 사진</h3>
+        <div class="form-group">
+          <label class="form-label">가게 소개글 *</label>
+          <textarea class="form-textarea" rows="4" placeholder="가게의 특징, 주력 메뉴, 강점 등을 자유롭게 작성해주세요.">매일 아침 신선한 재료로 정성껏 만드는 건강 도시락 전문점입니다. 저염식, 다이어트식 맞춤 주문이 가능하며 포항 지역 직접 배달합니다. 10년 경력의 영양사가 직접 식단을 설계합니다.</textarea>
+          <div class="form-hint">최소 50자 이상 작성해주세요</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">가게 대표 사진</label>
+          <div class="upload-area" onclick="document.getElementById('photoInput').click()">
+            <div class="upload-icon">&#128247;</div>
+            <div class="upload-text">사진을 끌어다 놓거나 클릭하세요</div>
+            <div class="upload-hint">JPG, PNG &middot; 최대 5MB &middot; 3장까지</div>
+          </div>
+          <input type="file" id="photoInput" style="display:none;" multiple accept="image/*">
+        </div>
+        <div class="form-group">
+          <label class="form-label">메뉴 사진</label>
+          <div class="upload-area" onclick="document.getElementById('menuPhotoInput').click()">
+            <div class="upload-icon">&#127860;</div>
+            <div class="upload-text">대표 메뉴 사진을 올려주세요</div>
+            <div class="upload-hint">JPG, PNG &middot; 최대 5MB &middot; 5장까지</div>
+          </div>
+          <input type="file" id="menuPhotoInput" style="display:none;" multiple accept="image/*">
+        </div>
+        <div class="form-group">
+          <label class="form-label">위생허가증 / 영업신고증</label>
+          <div class="upload-area" onclick="document.getElementById('licenseInput').click()">
+            <div class="upload-icon">&#128196;</div>
+            <div class="upload-text">위생허가증 또는 영업신고증을 업로드하세요</div>
+            <div class="upload-hint">JPG, PNG, PDF &middot; 최대 10MB</div>
+          </div>
+          <input type="file" id="licenseInput" style="display:none;" accept="image/*,.pdf">
+          <div class="form-hint">승인 심사 시 필요합니다. 필수는 아니지만 있으면 빠른 승인에 도움됩니다.</div>
+        </div>
+        <div class="step-nav">
+          <button class="btn btn-secondary btn-lg" onclick="goStep(2)">&larr; 이전</button>
+          <button class="btn btn-primary btn-lg btn-full" onclick="goStep(4)">다음 단계 &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: 확인 & 제출 -->
+    <div class="step-content" id="step-4">
+      <div class="card card-elevated" style="padding:32px;">
+        <h3 style="margin-bottom:24px;">&#9989; 최종 확인</h3>
+        <p style="margin-bottom:20px;">입력하신 정보를 확인해주세요. 제출 후 모락 팀이 검토하여 승인합니다.</p>
+
+        <div class="complete-info" style="margin-top:0;">
+          <div class="complete-info-row"><span class="complete-info-label">상호명</span><span class="complete-info-value">포항건강도시락</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">사업자번호</span><span class="complete-info-value">123-45-67890</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">대표자</span><span class="complete-info-value">김사장</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">연락처</span><span class="complete-info-value">010-9876-5432</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">주소</span><span class="complete-info-value">포항시 남구 효자동 456-7</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">업종</span><span class="complete-info-value">도시락</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">대표 메뉴</span><span class="complete-info-value">건강 도시락 (6,500원), 저염 도시락 (7,000원)</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">서비스 유형</span><span class="complete-info-value">단체주문, 정기구독</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">배달 지역</span><span class="complete-info-value">남구</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">배달 요일</span><span class="complete-info-value">월~금</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">배달 방식</span><span class="complete-info-value">직접 배달 (3,000원)</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">최소 주문</span><span class="complete-info-value">5인 이상</span></div>
+        </div>
+
+        <div style="margin-top:20px;padding:16px;background:var(--yellow-light);border-radius:var(--radius-sm);font-size:0.85rem;color:var(--yellow);">
+          &#9888; 제출 후 영업일 1~3일 내에 검토 결과를 카카오톡으로 알려드립니다.
+        </div>
+
+        <div class="step-nav">
+          <button class="btn btn-secondary btn-lg" onclick="goStep(3)">&larr; 수정하기</button>
+          <button class="btn btn-primary btn-lg btn-full" onclick="submitApplication()">&#128640; 입점 신청 제출하기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5: 완료 -->
+    <div class="step-content" id="step-5">
+      <div class="complete-section">
+        <div class="complete-icon">&#127881;</div>
+        <h2>입점 신청이 완료되었습니다!</h2>
+        <div class="complete-status">&#9200; 검토 중</div>
+        <p style="margin-top:16px;line-height:1.7;">
+          모락 팀이 신청 내용을 검토 중이에요.<br>
+          영업일 1~3일 내에 카카오톡으로 결과를 알려드릴게요.
+        </p>
+        <div class="complete-info">
+          <div class="complete-info-row"><span class="complete-info-label">신청번호</span><span class="complete-info-value">#APPLY-2026-0042</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">상호명</span><span class="complete-info-value">포항건강도시락</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">신청일시</span><span class="complete-info-value">2026.03.30 14:23</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">예상 승인</span><span class="complete-info-value">2026.04.01 ~ 04.02</span></div>
+        </div>
+
+        <!-- Kakao alert preview -->
+        <div style="max-width:320px;margin:24px auto 0;">
+          <div style="background:#F9E000;border-radius:12px;padding:4px;">
+            <div style="background:var(--white);border-radius:8px;padding:16px;font-size:0.8rem;line-height:1.6;text-align:left;">
+              <div style="font-weight:700;margin-bottom:8px;">[모락] 입점 신청이 접수되었습니다</div>
+              포항건강도시락 사장님, 안녕하세요!<br>
+              입점 신청이 접수되었습니다.<br><br>
+              &#128203; 신청번호: #APPLY-2026-0042<br>
+              &#128197; 예상 승인: 1~3 영업일<br><br>
+              승인 완료되면 바로 알려드릴게요!<br>
+              <div style="text-align:center;padding:10px;background:#F9E000;border-radius:6px;margin-top:12px;font-weight:600;font-size:0.8rem;">신청 상태 확인하기</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:32px;display:flex;gap:12px;justify-content:center;">
+          <a href="index.html" class="btn btn-secondary">홈으로 돌아가기</a>
+          <a href="store.html" class="btn btn-primary">사장님 페이지 미리보기</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentStep = 1;
+
+    function goStep(step) {
+      // Hide all steps
+      document.querySelectorAll('.step-content').forEach(s => s.classList.remove('active'));
+      document.getElementById('step-' + step).classList.add('active');
+
+      // Update progress bar
+      document.querySelectorAll('.progress-step').forEach((s, i) => {
+        s.classList.remove('active', 'done');
+        if (i + 1 < step) s.classList.add('done');
+        if (i + 1 === step) s.classList.add('active');
+      });
+      document.querySelectorAll('.progress-line').forEach((l, i) => {
+        l.classList.toggle('done', i + 1 < step);
+      });
+
+      currentStep = step;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function submitApplication() {
+      goStep(5);
+      // Hide progress bar
+      document.getElementById('progressBar').style.display = 'none';
+    }
+
+    function addMenu() {
+      const name = document.getElementById('newMenuName').value;
+      const price = document.getElementById('newMenuPrice').value;
+      if (!name || !price) return;
+      const list = document.getElementById('menuList');
+      const item = document.createElement('div');
+      item.className = 'menu-item';
+      item.innerHTML = `
+        <div class="menu-item-info">
+          <div class="menu-item-name">${name}</div>
+          <div class="menu-item-price">${parseInt(price).toLocaleString()}원 / 1인</div>
+        </div>
+        <button class="menu-remove" onclick="this.parentElement.remove()">&times;</button>
+      `;
+      list.appendChild(item);
+      document.getElementById('newMenuName').value = '';
+      document.getElementById('newMenuPrice').value = '';
+    }
+  </script>
+</body>
+</html>

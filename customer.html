@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모락 - 상점 둘러보기</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { padding-top: 64px; background: var(--cream); }
+
+    /* ===== Tabs Bar ===== */
+    .page-tabs {
+      background: var(--white); border-bottom: 1px solid var(--gray-100);
+      position: sticky; top: 64px; z-index: 100;
+    }
+    .page-tabs .container { display: flex; gap: 0; }
+    .page-tab {
+      padding: 16px 24px; font-weight: 500; font-size: 0.95rem;
+      color: var(--gray-400); cursor: pointer; border: none; background: none;
+      border-bottom: 2.5px solid transparent; transition: var(--transition);
+    }
+    .page-tab:hover { color: var(--charcoal); }
+    .page-tab.active { color: var(--orange); border-bottom-color: var(--orange); font-weight: 700; }
+
+    /* ===== Search & Filter ===== */
+    .search-section { padding: 32px 0 16px; }
+    .search-bar {
+      display: flex; gap: 12px; align-items: center;
+      background: var(--white); padding: 12px 20px;
+      border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+      border: 1.5px solid var(--gray-100);
+    }
+    .search-bar input {
+      flex: 1; border: none; outline: none; font-size: 1rem;
+      background: transparent; font-family: inherit;
+    }
+    .search-icon { font-size: 1.2rem; color: var(--gray-400); }
+    .filter-bar { margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .filter-label { font-size: 0.85rem; font-weight: 600; color: var(--gray-500); margin-right: 4px; }
+
+    /* ===== Store List ===== */
+    .stores-header { display: flex; justify-content: space-between; align-items: center; margin: 24px 0 16px; }
+    .stores-count { font-size: 0.9rem; color: var(--gray-400); }
+    .store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; padding-bottom: 40px; }
+
+    .store-card {
+      background: var(--white); border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-100); overflow: hidden;
+      transition: var(--transition); cursor: pointer;
+    }
+    .store-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
+    .store-img {
+      height: 180px; background: linear-gradient(135deg, var(--warm-beige), var(--sand));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.5rem; position: relative;
+    }
+    .store-img .store-badges {
+      position: absolute; top: 12px; left: 12px;
+      display: flex; gap: 6px;
+    }
+    .store-body { padding: 20px; }
+    .store-name { font-size: 1.1rem; font-weight: 700; color: var(--charcoal); }
+    .store-category { font-size: 0.8rem; color: var(--gray-400); margin-top: 2px; }
+    .store-desc { font-size: 0.85rem; color: var(--gray-500); margin-top: 8px; line-height: 1.5; }
+    .store-meta {
+      display: flex; gap: 16px; margin-top: 12px; padding-top: 12px;
+      border-top: 1px solid var(--gray-100); font-size: 0.8rem; color: var(--gray-400);
+    }
+    .store-meta span { display: flex; align-items: center; gap: 4px; }
+    .store-rating { color: var(--orange); font-weight: 600; }
+    .store-price { font-weight: 600; color: var(--charcoal); }
+    .store-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .store-tag {
+      font-size: 0.7rem; padding: 3px 8px; border-radius: 10px;
+      background: var(--light-beige); color: var(--gray-500);
+    }
+
+    /* ===== Order Modal ===== */
+    .order-section { margin-bottom: 24px; }
+    .order-section h4 { margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .order-section h4 .step-num {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--orange); color: white; font-size: 0.7rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .order-summary {
+      background: var(--light-beige); border-radius: var(--radius-md);
+      padding: 20px; margin-top: 20px;
+    }
+    .order-summary-row {
+      display: flex; justify-content: space-between; padding: 6px 0;
+      font-size: 0.9rem;
+    }
+    .order-summary-row.total {
+      border-top: 1.5px solid var(--sand); margin-top: 8px; padding-top: 12px;
+      font-weight: 700; font-size: 1.05rem;
+    }
+    .radio-group { display: flex; flex-direction: column; gap: 10px; }
+    .radio-option {
+      display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+      border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+      cursor: pointer; transition: var(--transition);
+    }
+    .radio-option:hover { border-color: var(--orange); }
+    .radio-option.selected { border-color: var(--orange); background: rgba(232,115,42,0.05); }
+    .radio-option input[type="radio"] { accent-color: var(--orange); }
+    .radio-option-label { font-size: 0.9rem; font-weight: 500; }
+    .radio-option-desc { font-size: 0.8rem; color: var(--gray-400); }
+
+    /* ===== Subscribe Tab ===== */
+    .sub-card {
+      background: var(--white); border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-100); overflow: hidden;
+      transition: var(--transition);
+    }
+    .sub-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .sub-card-header {
+      padding: 20px; background: linear-gradient(135deg, var(--warm-beige), var(--light-beige));
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .sub-card-body { padding: 20px; }
+    .sub-card-price { font-size: 1.3rem; font-weight: 800; color: var(--charcoal); }
+    .sub-card-price span { font-size: 0.85rem; font-weight: 400; color: var(--gray-400); }
+    .sub-schedule { display: flex; gap: 6px; margin-top: 12px; }
+    .sub-day {
+      width: 32px; height: 32px; border-radius: 50%; font-size: 0.75rem; font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--gray-100); color: var(--gray-400);
+    }
+    .sub-day.active { background: var(--orange); color: white; }
+
+    /* ===== My Page Tab ===== */
+    .my-order-card {
+      background: var(--white); border-radius: var(--radius-md);
+      border: 1px solid var(--gray-100); padding: 20px; margin-bottom: 12px;
+    }
+    .my-order-header { display: flex; justify-content: space-between; align-items: center; }
+    .my-order-title { font-weight: 600; }
+    .my-order-detail { font-size: 0.85rem; color: var(--gray-400); margin-top: 6px; }
+    .my-sub-card {
+      background: var(--white); border-radius: var(--radius-md);
+      border: 1px solid var(--gray-100); padding: 20px; margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    /* ===== Kakao Alert Preview ===== */
+    .kakao-preview {
+      background: #F9E000; border-radius: var(--radius-md);
+      padding: 4px; margin-top: 16px;
+    }
+    .kakao-preview-inner {
+      background: var(--white); border-radius: var(--radius-sm);
+      padding: 16px; font-size: 0.8rem; line-height: 1.6;
+      color: var(--charcoal);
+    }
+    .kakao-preview-title {
+      font-weight: 700; margin-bottom: 8px; font-size: 0.85rem;
+    }
+    .kakao-btn-preview {
+      display: block; text-align: center; padding: 10px;
+      background: #F9E000; border-radius: 6px; margin-top: 12px;
+      font-weight: 600; font-size: 0.8rem; color: #191919;
+    }
+  </style>
+</head>
+<body>
+  <!-- Nav -->
+  <nav class="nav scrolled">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo"><span class="steam">~</span> 모락</a>
+      <div class="nav-links">
+        <a href="index.html">홈</a>
+        <a href="customer.html" class="active">주문하기</a>
+        <a href="store-register.html">입점 신청</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Tabs -->
+  <div class="page-tabs">
+    <div class="container">
+      <button class="page-tab active" onclick="showTab('order')">&#128230; 단체주문</button>
+      <button class="page-tab" onclick="showTab('subscribe')">&#128260; 정기구독</button>
+      <button class="page-tab" onclick="showTab('mypage')">&#128100; 마이페이지</button>
+    </div>
+  </div>
+
+  <!-- ===== TAB 1: 단체주문 ===== -->
+  <div class="page-section active" id="tab-order">
+    <div class="container">
+      <!-- Search -->
+      <div class="search-section">
+        <div class="search-bar">
+          <span class="search-icon">&#128269;</span>
+          <input type="text" placeholder="상점명, 메뉴, 지역으로 검색..." id="searchInput">
+          <button class="btn btn-primary btn-sm">검색</button>
+        </div>
+        <div class="filter-bar">
+          <span class="filter-label">음식종류</span>
+          <div class="chip-group" id="catFilter">
+            <button class="chip active" data-cat="전체" onclick="filterCat(this)">전체</button>
+            <button class="chip" data-cat="케이터링" onclick="filterCat(this)">&#127860; 케이터링</button>
+            <button class="chip" data-cat="한식" onclick="filterCat(this)">&#127835; 한식</button>
+            <button class="chip" data-cat="커피/디저트" onclick="filterCat(this)">&#9749; 커피/디저트</button>
+            <button class="chip" data-cat="도시락" onclick="filterCat(this)">&#127841; 도시락</button>
+            <button class="chip" data-cat="분식" onclick="filterCat(this)">&#127829; 분식</button>
+            <button class="chip" data-cat="피자&치킨" onclick="filterCat(this)">&#127829; 피자&amp;치킨</button>
+            <button class="chip" data-cat="패스트푸드" onclick="filterCat(this)">&#127828; 패스트푸드</button>
+          </div>
+        </div>
+        <div class="filter-bar">
+          <span class="filter-label">배달지역</span>
+          <div class="chip-group" id="areaFilter">
+            <button class="chip active" data-area="전체" onclick="filterArea(this)">전체</button>
+            <button class="chip" data-area="남구" onclick="filterArea(this)">남구</button>
+            <button class="chip" data-area="북구" onclick="filterArea(this)">북구</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Store List -->
+      <div class="stores-header">
+        <h3>등록 상점</h3>
+        <span class="stores-count">총 8개 상점</span>
+      </div>
+      <div class="store-grid" id="storeGrid">
+        <!-- Cards generated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 2: 정기구독 ===== -->
+  <div class="page-section" id="tab-subscribe">
+    <div class="container">
+      <div class="search-section">
+        <h2>&#128260; 정기구독 상품</h2>
+        <p style="margin-top:8px;">마음에 드는 상점의 구독 상품을 신청하면 자동으로 배달됩니다.</p>
+        <div class="filter-bar" style="margin-top:20px;">
+          <span class="filter-label">카테고리</span>
+          <div class="chip-group">
+            <button class="chip active" onclick="toggleChip(this)">전체</button>
+            <button class="chip" onclick="toggleChip(this)">&#127860; 케이터링</button>
+            <button class="chip" onclick="toggleChip(this)">&#127835; 한식</button>
+            <button class="chip" onclick="toggleChip(this)">&#9749; 커피/디저트</button>
+            <button class="chip" onclick="toggleChip(this)">&#127841; 도시락</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="store-grid" id="subGrid">
+        <!-- Sub cards generated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 3: 마이페이지 ===== -->
+  <div class="page-section" id="tab-mypage">
+    <div class="container">
+      <div class="search-section">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="width:56px;height:56px;border-radius:50%;background:var(--warm-beige);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">&#128100;</div>
+          <div>
+            <h3>김민지님</h3>
+            <p class="text-sm text-gray">(주)포항테크 &middot; 경영지원팀</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="showMyTab('orders', this)">주문 내역</button>
+        <button class="tab" onclick="showMyTab('subs', this)">내 구독</button>
+        <button class="tab" onclick="showMyTab('profile', this)">프로필</button>
+      </div>
+
+      <!-- Orders -->
+      <div id="my-orders">
+        <div class="my-order-card">
+          <div class="my-order-header">
+            <span class="my-order-title">한식 도시락 20개</span>
+            <span class="badge badge-green">배달완료</span>
+          </div>
+          <div class="my-order-detail">남구분식당 &middot; 2026.03.28 &middot; 163,000원</div>
+        </div>
+        <div class="my-order-card">
+          <div class="my-order-header">
+            <span class="my-order-title">워크샵 다과 세트 15인</span>
+            <span class="badge badge-blue">준비중</span>
+          </div>
+          <div class="my-order-detail">달콤베이커리 &middot; 2026.04.05 &middot; 120,000원</div>
+        </div>
+        <div class="my-order-card">
+          <div class="my-order-header">
+            <span class="my-order-title">회의용 커피 30잔</span>
+            <span class="badge badge-orange">수락대기</span>
+          </div>
+          <div class="my-order-detail">포항로스터즈 &middot; 2026.04.02 &middot; 105,000원</div>
+        </div>
+        <div class="my-order-card">
+          <div class="my-order-header">
+            <span class="my-order-title">생일파티 케이크 + 간식</span>
+            <span class="badge badge-red">거절됨</span>
+          </div>
+          <div class="my-order-detail">해피데이즈 &middot; 2026.03.20 &middot; 85,000원</div>
+          <div style="margin-top:8px;padding:10px;background:var(--red-light);border-radius:8px;font-size:0.8rem;color:var(--red);">
+            거절 사유: 해당 날짜 재료 소진<br>
+            <a href="#" style="color:var(--orange);font-weight:600;">다른 상점 추천 보기 &rarr;</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subs -->
+      <div id="my-subs" class="hidden">
+        <div class="my-sub-card">
+          <div>
+            <div style="font-weight:600;">&#9749; 아메리카노 10잔 구독</div>
+            <div class="text-sm text-gray" style="margin-top:4px;">포항로스터즈 &middot; 매주 월/수/금</div>
+            <div class="text-sm" style="margin-top:4px;font-weight:600;">주 35,000원</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm">변경</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--red);">해지</button>
+          </div>
+        </div>
+        <div class="my-sub-card">
+          <div>
+            <div style="font-weight:600;">&#127841; 건강 도시락 구독</div>
+            <div class="text-sm text-gray" style="margin-top:4px;">건강한밥상 &middot; 매주 화/목</div>
+            <div class="text-sm" style="margin-top:4px;font-weight:600;">주 13,000원</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm">변경</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--red);">해지</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile -->
+      <div id="my-profile" class="hidden">
+        <div class="card" style="max-width:500px;">
+          <div class="form-group">
+            <label class="form-label">이름</label>
+            <input class="form-input" value="김민지" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">연락처</label>
+            <input class="form-input" value="010-1234-5678">
+          </div>
+          <div class="form-group">
+            <label class="form-label">이메일</label>
+            <input class="form-input" value="minji@pohangtech.co.kr">
+          </div>
+          <div class="form-group">
+            <label class="form-label">회사명</label>
+            <input class="form-input" value="(주)포항테크">
+          </div>
+          <div class="form-group">
+            <label class="form-label">부서</label>
+            <input class="form-input" value="경영지원팀">
+          </div>
+          <div class="form-group">
+            <label class="form-label">기본 배달 주소</label>
+            <input class="form-input" value="포항시 남구 효자동 123-4 포항테크빌딩 3층">
+          </div>
+          <div class="form-group">
+            <label class="form-label">알레르기 / 식이 제한</label>
+            <input class="form-input" value="견과류 알레르기" placeholder="없으면 비워두세요">
+            <div class="form-hint">단체주문 시 사장님에게 자동으로 전달됩니다.</div>
+          </div>
+          <button class="btn btn-primary mt-16">저장하기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Order Modal ===== -->
+  <div class="modal-overlay" id="orderModal">
+    <div class="modal" style="max-width:640px;">
+      <div class="modal-header">
+        <h3 id="modalStoreName">남구분식당</h3>
+        <button class="modal-close" onclick="closeOrderModal()">&times;</button>
+      </div>
+
+      <!-- Step 1: 메뉴/인원 -->
+      <div class="order-section">
+        <h4><span class="step-num">1</span> 주문 정보</h4>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">메뉴 선택</label>
+            <select class="form-select" id="menuSelect" onchange="updateSummary()">
+              <option value="8000">한식 도시락 (8,000원)</option>
+              <option value="9500">특선 도시락 (9,500원)</option>
+              <option value="12000">프리미엄 세트 (12,000원)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">수량 (인원)</label>
+            <input class="form-input" type="number" value="20" min="5" max="200" id="qtyInput" onchange="updateSummary()">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">요청사항</label>
+          <textarea class="form-textarea" placeholder="알레르기, 특이사항 등을 입력해주세요" rows="2">견과류 알레르기 있는 분 2명</textarea>
+        </div>
+      </div>
+
+      <!-- Step 2: 배달 정보 -->
+      <div class="order-section">
+        <h4><span class="step-num">2</span> 배달 정보</h4>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">배달 날짜</label>
+            <input class="form-input" type="date" value="2026-03-31">
+            <div class="form-hint">최소 3일 전 예약 필수</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">배달 시간</label>
+            <input class="form-input" type="time" value="12:00">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">배달 주소</label>
+          <input class="form-input" value="포항시 남구 효자동 123-4 포항테크빌딩 3층">
+        </div>
+        <div class="form-group">
+          <label class="form-label">배달 방식</label>
+          <div class="radio-group">
+            <label class="radio-option selected" onclick="selectRadio(this)">
+              <input type="radio" name="delivery" checked>
+              <div>
+                <div class="radio-option-label">&#128666; 가게 직접 배달</div>
+                <div class="radio-option-desc">배달비 3,000원 &middot; 약 40분 소요</div>
+              </div>
+            </label>
+            <label class="radio-option" onclick="selectRadio(this)">
+              <input type="radio" name="delivery">
+              <div>
+                <div class="radio-option-label">&#128690; 퀵 배달 (바로고)</div>
+                <div class="radio-option-desc">배달비 5,000원 &middot; 약 25분 소요</div>
+              </div>
+            </label>
+            <label class="radio-option" onclick="selectRadio(this)">
+              <input type="radio" name="delivery">
+              <div>
+                <div class="radio-option-label">&#127939; 직접 픽업</div>
+                <div class="radio-option-desc">배달비 무료 &middot; 가게에서 수령</div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: 결제/영수증 -->
+      <div class="order-section">
+        <h4><span class="step-num">3</span> 결제 및 영수증</h4>
+        <div class="form-group">
+          <label class="form-label">결제 방식</label>
+          <div class="radio-group">
+            <label class="radio-option selected" onclick="selectRadio(this)">
+              <input type="radio" name="payment" checked>
+              <div>
+                <div class="radio-option-label">상점 직접 결제 (계좌이체)</div>
+                <div class="radio-option-desc">주문 수락 후 상점 계좌로 입금</div>
+              </div>
+            </label>
+            <label class="radio-option" onclick="selectRadio(this)">
+              <input type="radio" name="payment">
+              <div>
+                <div class="radio-option-label">카드 결제 (법인/개인)</div>
+                <div class="radio-option-desc">배달 시 카드 결제</div>
+              </div>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">영수증 유형</label>
+          <div class="radio-group">
+            <label class="radio-option" onclick="selectRadio(this)">
+              <input type="radio" name="receipt">
+              <div><div class="radio-option-label">영수증 불필요 (개인 주문)</div></div>
+            </label>
+            <label class="radio-option" onclick="selectRadio(this)">
+              <input type="radio" name="receipt">
+              <div><div class="radio-option-label">현금영수증 (소득공제용)</div></div>
+            </label>
+            <label class="radio-option selected" onclick="selectRadio(this)">
+              <input type="radio" name="receipt" checked>
+              <div>
+                <div class="radio-option-label">세금계산서 발행</div>
+                <div class="radio-option-desc">사업자번호 입력 필요</div>
+              </div>
+            </label>
+            <label class="radio-option" onclick="selectRadio(this)">
+              <input type="radio" name="receipt">
+              <div>
+                <div class="radio-option-label">카드 매출전표 (법인카드)</div>
+              </div>
+            </label>
+          </div>
+        </div>
+        <!-- Tax Invoice Fields -->
+        <div class="grid-2" id="taxFields">
+          <div class="form-group">
+            <label class="form-label">사업자번호</label>
+            <input class="form-input" placeholder="123-45-67890">
+          </div>
+          <div class="form-group">
+            <label class="form-label">상호명</label>
+            <input class="form-input" placeholder="(주)포항테크">
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="order-summary">
+        <h4 style="margin-bottom:12px;">주문 요약</h4>
+        <div class="order-summary-row">
+          <span id="summaryMenu">한식 도시락 x 20개</span>
+          <span id="summaryMenuPrice">160,000원</span>
+        </div>
+        <div class="order-summary-row">
+          <span>배달비</span>
+          <span>3,000원</span>
+        </div>
+        <div class="order-summary-row total">
+          <span>총 결제금액</span>
+          <span id="summaryTotal">163,000원</span>
+        </div>
+      </div>
+
+      <!-- Kakao Preview -->
+      <div class="kakao-preview">
+        <div class="kakao-preview-inner">
+          <div class="kakao-preview-title">[모락] 주문이 접수되었어요!</div>
+          주문이 사장님에게 전달되었습니다.<br>
+          수락 시 카카오톡으로 알려드릴게요.<br><br>
+          &#128230; 한식 도시락 20개<br>
+          &#128197; 3월 31일(월) 12:00 배달<br>
+          &#128205; 효자동 포항테크빌딩 3층<br>
+          <div class="kakao-btn-preview">주문 상세 보기</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full btn-lg mt-24" onclick="submitOrder()">
+        주문 요청하기
+      </button>
+      <p class="text-center text-sm text-gray mt-8">사장님이 2시간 내에 수락/거절합니다.</p>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal" style="max-width:420px;text-align:center;">
+      <div style="font-size:4rem;margin-bottom:16px;">&#127881;</div>
+      <h3>주문이 접수되었어요!</h3>
+      <p style="margin-top:12px;">사장님에게 카카오톡 알림이 전달되었습니다.<br>수락되면 바로 알려드릴게요.</p>
+      <div style="margin-top:24px;padding:16px;background:var(--light-beige);border-radius:12px;text-align:left;">
+        <div style="font-size:0.85rem;color:var(--gray-500);">주문번호</div>
+        <div style="font-weight:700;font-size:1.1rem;margin-top:4px;">#2026-0330-001</div>
+      </div>
+      <button class="btn btn-primary btn-full mt-24" onclick="closeSuccessModal()">확인</button>
+    </div>
+  </div>
+
+  <script>
+    // Store data
+    const stores = [
+      { name: '남구분식당', cat: '도시락', emoji: '&#127841;', rating: 4.9, reviews: 128, price: '8,000원~', desc: '정성 가득 한식 도시락. 매일 아침 직접 만든 반찬 12가지.', tags: ['단체주문', '도시락', '한식'], areas: ['남구'], delivery: '직접배달', min: '5인 이상' },
+      { name: '포항로스터즈', cat: '커피/디저트', emoji: '&#9749;', rating: 4.8, reviews: 95, price: '3,500원~', desc: '직접 로스팅한 스페셜티 원두. 단체 커피 배달 전문.', tags: ['구독가능', '커피', '음료'], areas: ['남구'], delivery: '직접배달', min: '10잔 이상' },
+      { name: '달콤베이커리', cat: '커피/디저트', emoji: '&#127856;', rating: 4.7, reviews: 67, price: '5,000원~', desc: '수제 베이커리와 디저트 세트. 회의 다과 전문.', tags: ['단체주문', '다과', '디저트'], areas: ['남구'], delivery: '퀵배달', min: '10인 이상' },
+      { name: '건강한밥상', cat: '도시락', emoji: '&#129367;', rating: 4.8, reviews: 82, price: '6,500원~', desc: '저염식, 다이어트식 전문. 맞춤 건강 도시락.', tags: ['구독가능', '건강식', '도시락'], areas: ['남구'], delivery: '직접배달', min: '5인 이상' },
+      { name: '포항김밥천국', cat: '분식', emoji: '&#127835;', rating: 4.5, reviews: 203, price: '4,000원~', desc: '김밥, 떡볶이, 튀김 세트. 소규모 모임에 딱!', tags: ['단체주문', '분식', '소규모OK'], areas: ['남구', '북구'], delivery: '직접배달', min: '5인 이상' },
+      { name: '해피데이즈', cat: '케이터링', emoji: '&#127874;', rating: 4.6, reviews: 45, price: '10,000원~', desc: '생일파티, 기념일 맞춤 케이터링. 케이크부터 핑거푸드까지.', tags: ['파티', '케이터링', '케이크'], areas: ['남구'], delivery: '직접배달', min: '10인 이상' },
+      { name: '죽도시장 밥상', cat: '한식', emoji: '&#127858;', rating: 4.9, reviews: 156, price: '7,000원~', desc: '죽도시장 골목 맛집. 정갈한 한정식 스타일 도시락.', tags: ['단체주문', '한식', '한정식'], areas: ['남구', '북구'], delivery: '퀵배달', min: '10인 이상' },
+      { name: '양덕동 샌드위치', cat: '패스트푸드', emoji: '&#129386;', rating: 4.4, reviews: 38, price: '5,500원~', desc: '신선한 재료로 만든 프리미엄 샌드위치 세트.', tags: ['구독가능', '양식', '샌드위치'], areas: ['남구'], delivery: '직접배달', min: '5인 이상' },
+    ];
+
+    let activeCat = '전체';
+    let activeArea = '전체';
+
+    // Category filter
+    function filterCat(btn) {
+      document.querySelectorAll('#catFilter .chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      activeCat = btn.dataset.cat;
+      renderStores();
+    }
+
+    // Area filter
+    function filterArea(btn) {
+      document.querySelectorAll('#areaFilter .chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      activeArea = btn.dataset.area;
+      renderStores();
+    }
+
+    // Render store cards
+    function renderStores() {
+      const grid = document.getElementById('storeGrid');
+      const filtered = stores.filter(s => {
+        const catOk = activeCat === '전체' || s.cat === activeCat;
+        const areaOk = activeArea === '전체' || s.areas.includes(activeArea);
+        return catOk && areaOk;
+      });
+      document.querySelector('.stores-count').textContent = `총 ${filtered.length}개 상점`;
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--gray-400);">
+          <div style="font-size:2.5rem;margin-bottom:12px;">🔍</div>
+          <div style="font-weight:600;">해당 카테고리의 상점이 없습니다</div>
+          <div style="font-size:0.85rem;margin-top:8px;">다른 카테고리를 선택해보세요</div>
+        </div>`;
+        return;
+      }
+      grid.innerHTML = filtered.map((s) => {
+        const realIdx = stores.indexOf(s);
+        return `
+        <div class="store-card" onclick="openOrderModal(${realIdx})">
+          <div class="store-img">
+            ${s.emoji}
+            <div class="store-badges">
+              ${s.tags.includes('구독가능') ? '<span class="badge badge-orange">구독가능</span>' : ''}
+              ${s.tags.includes('소규모OK') ? '<span class="badge badge-green">소규모OK</span>' : ''}
+            </div>
+          </div>
+          <div class="store-body">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div>
+                <div class="store-name">${s.name}</div>
+                <div class="store-category">${s.cat}</div>
+              </div>
+              <div class="store-price">${s.price}</div>
+            </div>
+            <div class="store-desc">${s.desc}</div>
+            <div class="store-tags">
+              ${s.areas.map(a => `<span class="store-tag">${a}</span>`).join('')}
+            </div>
+            <div class="store-meta">
+              <span class="store-rating">&#11088; ${s.rating}</span>
+              <span>&#128172; 리뷰 ${s.reviews}</span>
+              <span>&#128666; ${s.delivery}</span>
+              <span>${s.min}</span>
+            </div>
+          </div>
+        </div>
+      `; }).join('');
+    }
+
+    // Subscription data
+    const subs = [
+      { store: '건강한밥상', emoji: '&#127841;', name: '건강 도시락 구독', desc: '매일 다른 건강식 도시락을 배달받으세요', price: '6,500', unit: '끼', days: [1,1,1,1,1,0,0], area: '남구' },
+      { store: '포항로스터즈', emoji: '&#9749;', name: '오피스 커피 구독', desc: '매일 아침 신선한 원두커피를 사무실로', price: '3,500', unit: '잔', days: [1,0,1,0,1,0,0], area: '남구' },
+      { store: '양덕동 샌드위치', emoji: '&#129386;', name: '아침 샌드위치 구독', desc: '건강한 아침을 샌드위치로 시작하세요', price: '5,500', unit: '개', days: [1,1,1,1,1,0,0], area: '남구' },
+      { store: '달콤베이커리', emoji: '&#127856;', name: '오후 다과 세트 구독', desc: '매주 금요일 팀 간식을 배달합니다', price: '8,000', unit: '세트', days: [0,0,0,0,1,0,0], area: '남구' },
+    ];
+
+    function renderSubs() {
+      const grid = document.getElementById('subGrid');
+      const dayNames = ['월','화','수','목','금','토','일'];
+      grid.innerHTML = subs.map(s => `
+        <div class="sub-card">
+          <div class="sub-card-header">
+            <div>
+              <div style="font-size:0.8rem;color:var(--gray-500);">${s.store}</div>
+              <div style="font-weight:700;font-size:1.1rem;margin-top:4px;">${s.emoji} ${s.name}</div>
+            </div>
+            <span class="badge badge-orange">구독가능</span>
+          </div>
+          <div class="sub-card-body">
+            <p class="text-sm" style="color:var(--gray-500);">${s.desc}</p>
+            <div class="sub-card-price" style="margin-top:12px;">${s.price}원 <span>/ ${s.unit}</span></div>
+            <div class="sub-schedule">
+              ${dayNames.map((d, i) => `<div class="sub-day ${s.days[i] ? 'active' : ''}">${d}</div>`).join('')}
+            </div>
+            <div class="text-xs text-gray" style="margin-top:8px;">배달 가능: ${s.area}</div>
+            <button class="btn btn-primary btn-full mt-16 btn-sm">구독 신청하기</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Tab switching
+    function showTab(tab) {
+      document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function showMyTab(tab, btn) {
+      ['orders','subs','profile'].forEach(t => {
+        document.getElementById('my-' + t).classList.toggle('hidden', t !== tab);
+      });
+      btn.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    // Chip toggle
+    function toggleChip(el) {
+      const siblings = el.parentElement.querySelectorAll('.chip');
+      if (el.textContent.trim() === '전체') {
+        siblings.forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+      } else {
+        el.parentElement.querySelector('.chip:first-child').classList.remove('active');
+        el.classList.toggle('active');
+        const anyActive = [...siblings].some((c, i) => i > 0 && c.classList.contains('active'));
+        if (!anyActive) siblings[0].classList.add('active');
+      }
+    }
+
+    // Radio select
+    function selectRadio(el) {
+      el.closest('.radio-group').querySelectorAll('.radio-option').forEach(r => r.classList.remove('selected'));
+      el.classList.add('selected');
+      el.querySelector('input[type="radio"]').checked = true;
+    }
+
+    // Order Modal
+    function openOrderModal(idx) {
+      const store = stores[idx];
+      document.getElementById('modalStoreName').textContent = store.name;
+      document.getElementById('orderModal').classList.add('show');
+      document.body.style.overflow = 'hidden';
+      updateSummary();
+    }
+    function closeOrderModal() {
+      document.getElementById('orderModal').classList.remove('show');
+      document.body.style.overflow = '';
+    }
+    function updateSummary() {
+      const price = parseInt(document.getElementById('menuSelect').value);
+      const qty = parseInt(document.getElementById('qtyInput').value) || 1;
+      const total = price * qty;
+      const menuText = document.getElementById('menuSelect').selectedOptions[0].text.split('(')[0].trim();
+      document.getElementById('summaryMenu').textContent = `${menuText} x ${qty}개`;
+      document.getElementById('summaryMenuPrice').textContent = total.toLocaleString() + '원';
+      document.getElementById('summaryTotal').textContent = (total + 3000).toLocaleString() + '원';
+    }
+
+    function submitOrder() {
+      closeOrderModal();
+      document.getElementById('successModal').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSuccessModal() {
+      document.getElementById('successModal').classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    // Init
+    renderStores();
+    renderSubs();
+  </script>
+</body>
+</html>

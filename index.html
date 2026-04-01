@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모락 Morak - 단체주문 & 정기구독 플랫폼</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/lucide-static@latest/font/lucide.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/landing.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav" id="mainNav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <span class="steam">~</span> 모락
+      </a>
+      <div class="nav-links">
+        <a href="#features">서비스 소개</a>
+        <a href="#how-it-works">이용 방법</a>
+        <a href="#pricing">요금제</a>
+        <a href="customer.html" class="btn btn-secondary btn-sm">주문하기</a>
+        <a href="store-register.html" class="btn btn-primary btn-sm">입점 신청</a>
+      </div>
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#features">서비스 소개</a>
+    <a href="#how-it-works">이용 방법</a>
+    <a href="#pricing">요금제</a>
+    <a href="customer.html">주문하기</a>
+    <a href="store-register.html">입점 신청</a>
+  </div>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-text">
+          <div class="hero-badge">포항 지역 단체주문 & 구독 플랫폼</div>
+          <h1>동네 맛집에서<br><span class="text-orange">단체주문</span>도,<br><span class="text-orange">정기구독</span>도<br>한 번에.</h1>
+          <p class="hero-desc">
+            행사 도시락, 회의 다과, 아침 구독까지.<br>
+            모락이 우리 동네 상점과 연결해드려요.
+          </p>
+          <div class="hero-actions">
+            <a href="customer.html" class="btn btn-primary btn-lg">상점 둘러보기</a>
+            <a href="store-register.html" class="btn btn-secondary btn-lg">사장님 입점 신청</a>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <strong>50+</strong><span>등록 상점</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat">
+              <strong>1,200+</strong><span>누적 주문</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat">
+              <strong>4.8</strong><span>평균 만족도</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-card hero-card-1">
+            <div class="hero-card-icon">&#127841;</div>
+            <div>
+              <div class="hero-card-title">한식 도시락 20개</div>
+              <div class="hero-card-sub">남구분식당 &middot; 3/31 배달</div>
+            </div>
+            <span class="badge badge-green">수락됨</span>
+          </div>
+          <div class="hero-card hero-card-2">
+            <div class="hero-card-icon">&#9749;</div>
+            <div>
+              <div class="hero-card-title">커피 구독 (매주 월)</div>
+              <div class="hero-card-sub">포항로스터즈 &middot; 아메리카노 10잔</div>
+            </div>
+            <span class="badge badge-orange">구독중</span>
+          </div>
+          <div class="hero-card hero-card-3">
+            <div class="hero-card-icon">&#127835;</div>
+            <div>
+              <div class="hero-card-title">워크샵 다과 세트</div>
+              <div class="hero-card-sub">달콤베이커리 &middot; 4/5 배달</div>
+            </div>
+            <span class="badge badge-blue">준비중</span>
+          </div>
+          <div class="steam-animation">
+            <div class="steam-line s1"></div>
+            <div class="steam-line s2"></div>
+            <div class="steam-line s3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2>두 가지 서비스, 하나의 플랫폼</h2>
+        <p>단체주문으로 처음 만나고, 정기구독으로 단골이 되는 구조</p>
+      </div>
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon">&#128230;</div>
+          <h3>단체주문</h3>
+          <p>승진 축하, 퇴직 기념, 워크샵, 생일파티...<br>5명부터 100명까지, 행사에 맞는 상점을 한눈에 비교하고 간편하게 주문하세요.</p>
+          <ul class="service-features">
+            <li>행사 유형별 상점 필터링</li>
+            <li>인원/예산/날짜로 맞춤 검색</li>
+            <li>견적 즉시 확인</li>
+            <li>영수증/세금계산서 발행</li>
+          </ul>
+          <a href="customer.html" class="btn btn-primary btn-full mt-16">단체주문 하러가기</a>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">&#128260;</div>
+          <h3>정기구독</h3>
+          <p>매주 월요일 아침 도시락, 수요일 커피 배달...<br>마음에 드는 상점의 구독 상품을 신청하면 자동으로 배달됩니다.</p>
+          <ul class="service-features">
+            <li>아침식사/도시락/커피/다과 구독</li>
+            <li>요일/시간 맞춤 설정</li>
+            <li>언제든 구독 변경/해지</li>
+            <li>구독 할인 혜택</li>
+          </ul>
+          <a href="customer.html#subscribe" class="btn btn-primary btn-full mt-16">구독상품 보기</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it Works -->
+  <section class="section section-beige" id="how-it-works">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2>이용 방법</h2>
+        <p>고객님도, 사장님도 간단해요</p>
+      </div>
+
+      <!-- Customer Flow -->
+      <div class="flow-section">
+        <h3 class="flow-title">&#128100; 고객님이라면</h3>
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-step-num">1</div>
+            <div class="flow-step-icon">&#128269;</div>
+            <h4>상점 검색</h4>
+            <p>행사 유형, 인원, 예산으로<br>맞는 상점을 찾으세요</p>
+          </div>
+          <div class="flow-arrow">&#8594;</div>
+          <div class="flow-step">
+            <div class="flow-step-num">2</div>
+            <div class="flow-step-icon">&#128221;</div>
+            <h4>주문 요청</h4>
+            <p>메뉴, 수량, 배달 정보를<br>입력하고 주문하세요</p>
+          </div>
+          <div class="flow-arrow">&#8594;</div>
+          <div class="flow-step">
+            <div class="flow-step-num">3</div>
+            <div class="flow-step-icon">&#128276;</div>
+            <h4>알림 수신</h4>
+            <p>사장님이 수락하면<br>카톡으로 알려드려요</p>
+          </div>
+          <div class="flow-arrow">&#8594;</div>
+          <div class="flow-step">
+            <div class="flow-step-num">4</div>
+            <div class="flow-step-icon">&#127881;</div>
+            <h4>배달 완료</h4>
+            <p>약속된 시간에<br>맛있게 드세요!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Store Flow -->
+      <div class="flow-section mt-48">
+        <h3 class="flow-title">&#127978; 사장님이라면</h3>
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-step-num">1</div>
+            <div class="flow-step-icon">&#128221;</div>
+            <h4>입점 신청</h4>
+            <p>상점 정보, 메뉴, 배달 지역을<br>등록해주세요</p>
+          </div>
+          <div class="flow-arrow">&#8594;</div>
+          <div class="flow-step">
+            <div class="flow-step-num">2</div>
+            <div class="flow-step-icon">&#9989;</div>
+            <h4>승인 완료</h4>
+            <p>모락 팀이 확인 후<br>승인해드려요</p>
+          </div>
+          <div class="flow-arrow">&#8594;</div>
+          <div class="flow-step">
+            <div class="flow-step-num">3</div>
+            <div class="flow-step-icon">&#128276;</div>
+            <h4>주문 알림</h4>
+            <p>주문이 오면<br>카톡으로 알려드려요</p>
+          </div>
+          <div class="flow-arrow">&#8594;</div>
+          <div class="flow-step">
+            <div class="flow-step-num">4</div>
+            <div class="flow-step-icon">&#128200;</div>
+            <h4>매출 성장</h4>
+            <p>단골 구독으로<br>안정적인 매출!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Morak -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2>왜 모락인가요?</h2>
+        <p>기존 단체주문의 불편함을 해결합니다</p>
+      </div>
+      <div class="comparison">
+        <div class="comparison-before">
+          <h4>기존 방식</h4>
+          <ul>
+            <li>&#10060; 네이버 검색 + 블로그 서핑</li>
+            <li>&#10060; 일일이 전화해서 가능 여부 확인</li>
+            <li>&#10060; 가격 비교 불가</li>
+            <li>&#10060; 영수증/세금계산서 따로 요청</li>
+            <li>&#10060; 단골 혜택 없음</li>
+          </ul>
+          <div class="comparison-time">소요 시간: 2~3시간</div>
+        </div>
+        <div class="comparison-arrow">&#10145;</div>
+        <div class="comparison-after">
+          <h4>모락으로</h4>
+          <ul>
+            <li>&#9989; 한 곳에서 상점 비교</li>
+            <li>&#9989; 온라인으로 바로 주문 요청</li>
+            <li>&#9989; 투명한 가격 확인</li>
+            <li>&#9989; 영수증/세금계산서 자동 발행</li>
+            <li>&#9989; 구독으로 단골 혜택</li>
+          </ul>
+          <div class="comparison-time highlight">소요 시간: 5분</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="section section-beige" id="pricing">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2>사장님 요금제</h2>
+        <p>고객님은 무료! 사장님만 합리적인 요금을 내세요.</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-badge">시작하기</div>
+          <h3>베이직</h3>
+          <div class="pricing-price"><span class="pricing-amount">무료</span></div>
+          <p class="pricing-desc">처음 시작하는 사장님을 위해</p>
+          <ul class="pricing-features">
+            <li>&#9989; 가게 등록 및 노출</li>
+            <li>&#9989; 구독상품 1개 등록</li>
+            <li>&#9989; 단체주문 수신</li>
+            <li>&#9989; 카카오톡 주문 알림</li>
+            <li class="disabled">&#10060; 매출 분석 대시보드</li>
+            <li class="disabled">&#10060; 우선 노출</li>
+          </ul>
+          <a href="store-register.html" class="btn btn-secondary btn-full">무료로 시작하기</a>
+        </div>
+        <div class="pricing-card popular">
+          <div class="pricing-badge">인기</div>
+          <h3>스탠다드</h3>
+          <div class="pricing-price">
+            <span class="pricing-currency">월</span>
+            <span class="pricing-amount">29,000</span>
+            <span class="pricing-currency">원</span>
+          </div>
+          <p class="pricing-desc">본격적으로 성장하는 사장님</p>
+          <ul class="pricing-features">
+            <li>&#9989; 베이직 기능 전체</li>
+            <li>&#9989; 구독상품 5개 등록</li>
+            <li>&#9989; 매출/주문 통합 대시보드</li>
+            <li>&#9989; 카톡 마케팅 메시지</li>
+            <li>&#9989; 리뷰 관리</li>
+            <li class="disabled">&#10060; 우선 노출</li>
+          </ul>
+          <a href="store-register.html" class="btn btn-primary btn-full">스탠다드 시작하기</a>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-badge">프로</div>
+          <h3>프로</h3>
+          <div class="pricing-price">
+            <span class="pricing-currency">월</span>
+            <span class="pricing-amount">59,000</span>
+            <span class="pricing-currency">원</span>
+          </div>
+          <p class="pricing-desc">최대 성과를 원하는 사장님</p>
+          <ul class="pricing-features">
+            <li>&#9989; 스탠다드 기능 전체</li>
+            <li>&#9989; 구독상품 무제한 등록</li>
+            <li>&#9989; 우선 검색 노출</li>
+            <li>&#9989; AI 매출 분석</li>
+            <li>&#9989; 전담 매니저 지원</li>
+            <li>&#9989; 맞춤 프로모션 설계</li>
+          </ul>
+          <a href="store-register.html" class="btn btn-secondary btn-full">프로 시작하기</a>
+        </div>
+      </div>
+      <p class="text-center text-sm text-gray mt-24">
+        * 현재 오픈 기념으로 모든 요금제 3개월 무료 제공 중!
+      </p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section cta-section">
+    <div class="container text-center">
+      <h2>포항에서 시작합니다</h2>
+      <p class="cta-desc">동네 맛집과 고객을 연결하는 따뜻한 플랫폼,<br>모락과 함께 성장하세요.</p>
+      <div class="cta-actions">
+        <a href="customer.html" class="btn btn-primary btn-lg">주문하러 가기</a>
+        <a href="store-register.html" class="btn btn-secondary btn-lg">사장님 입점 신청</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="nav-logo"><span class="steam">~</span> 모락</div>
+          <p>동네 맛집과 고객을 연결하는<br>단체주문 & 정기구독 플랫폼</p>
+        </div>
+        <div class="footer-links">
+          <h4>서비스</h4>
+          <a href="customer.html">단체주문</a>
+          <a href="customer.html#subscribe">정기구독</a>
+          <a href="store-register.html">입점 신청</a>
+        </div>
+        <div class="footer-links">
+          <h4>고객지원</h4>
+          <a href="#">자주 묻는 질문</a>
+          <a href="#">이용약관</a>
+          <a href="#">개인정보처리방침</a>
+        </div>
+        <div class="footer-links">
+          <h4>연락처</h4>
+          <p>포항시 남구</p>
+          <p>hello@morak.co.kr</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 모락(Morak). All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    // Mobile menu
+    function toggleMobileMenu() {
+      document.getElementById('mobileMenu').classList.toggle('show');
+    }
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const el = document.querySelector(a.getAttribute('href'));
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('mobileMenu')?.classList.remove('show');
+      });
+    });
+  </script>
+</body>
+</html>

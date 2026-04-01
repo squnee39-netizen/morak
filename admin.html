@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모락 - 관리자</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { padding-top: 64px; background: #0F0F0F; color: var(--gray-200); }
+    .nav { background: rgba(15,15,15,0.95); border-bottom-color: #2A2A2A; }
+    .nav-logo { color: var(--white); }
+    .nav-links a { color: var(--gray-400); }
+    .nav-links a:hover { color: var(--white); background: #2A2A2A; }
+    .nav-links a.active { color: var(--orange); }
+
+    /* Layout */
+    .admin-layout { display: flex; min-height: calc(100vh - 64px); }
+    .admin-sidebar {
+      width: 220px; background: #1A1A1A; padding: 24px 0;
+      border-right: 1px solid #2A2A2A; flex-shrink: 0;
+      position: sticky; top: 64px; height: calc(100vh - 64px);
+    }
+    .admin-sidebar-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 20px; color: var(--gray-400); cursor: pointer;
+      font-size: 0.9rem; font-weight: 500; transition: var(--transition);
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .admin-sidebar-item:hover { background: #2A2A2A; color: var(--white); }
+    .admin-sidebar-item.active { color: var(--orange); background: rgba(232,115,42,0.1); border-right: 3px solid var(--orange); }
+    .admin-sidebar-badge {
+      margin-left: auto; background: var(--red); color: white;
+      font-size: 0.65rem; padding: 2px 7px; border-radius: 10px; font-weight: 700;
+    }
+    .admin-main { flex: 1; padding: 32px; }
+
+    /* Stats */
+    .admin-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .a-stat {
+      background: #1A1A1A; border-radius: var(--radius-md);
+      border: 1px solid #2A2A2A; padding: 20px; text-align: center;
+    }
+    .a-stat-val { font-size: 2rem; font-weight: 800; color: var(--white); }
+    .a-stat-label { font-size: 0.8rem; color: var(--gray-400); margin-top: 4px; }
+
+    /* Application Cards */
+    .app-card {
+      background: #1A1A1A; border-radius: var(--radius-md);
+      border: 1px solid #2A2A2A; margin-bottom: 12px;
+      transition: var(--transition); overflow: hidden;
+    }
+    .app-card:hover { border-color: #3A3A3A; }
+    .app-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 20px; cursor: pointer;
+    }
+    .app-card-left { display: flex; align-items: center; gap: 14px; }
+    .app-card-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--warm-beige), var(--sand));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+    .app-card-name { font-weight: 700; color: var(--white); font-size: 1rem; }
+    .app-card-meta { font-size: 0.8rem; color: var(--gray-400); margin-top: 2px; }
+    .app-card-right { display: flex; align-items: center; gap: 12px; }
+    .app-card-time { font-size: 0.75rem; color: var(--gray-500); }
+
+    /* Expanded Detail */
+    .app-card-detail {
+      display: none; padding: 0 20px 20px;
+      border-top: 1px solid #2A2A2A;
+    }
+    .app-card.expanded .app-card-detail { display: block; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    .detail-item { }
+    .detail-label { font-size: 0.75rem; color: var(--gray-500); margin-bottom: 2px; }
+    .detail-value { font-size: 0.9rem; color: var(--gray-200); font-weight: 500; }
+    .detail-full { grid-column: 1 / -1; }
+    .detail-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+    .detail-tag {
+      padding: 3px 10px; border-radius: 12px; font-size: 0.75rem;
+      background: rgba(232,115,42,0.12); color: var(--orange);
+    }
+    .detail-actions {
+      display: flex; gap: 10px; margin-top: 20px;
+      padding-top: 16px; border-top: 1px solid #2A2A2A;
+    }
+
+    /* Approved/Rejected list */
+    .status-card {
+      background: #1A1A1A; border-radius: var(--radius-md);
+      border: 1px solid #2A2A2A; padding: 16px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .status-card-left { display: flex; align-items: center; gap: 12px; }
+    .status-card-name { font-weight: 600; color: var(--white); font-size: 0.95rem; }
+    .status-card-meta { font-size: 0.8rem; color: var(--gray-500); margin-top: 2px; }
+
+    /* Notification Settings */
+    .admin-notif {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 0; border-bottom: 1px solid #2A2A2A;
+    }
+    .admin-notif:last-child { border-bottom: none; }
+    .admin-notif-label { color: var(--gray-200); font-size: 0.9rem; }
+    .admin-notif-desc { font-size: 0.8rem; color: var(--gray-500); margin-top: 2px; }
+
+    /* Panel */
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
+
+    /* Kakao preview in detail */
+    .kakao-mini {
+      background: #F9E000; border-radius: 8px; padding: 3px; margin-top: 12px;
+    }
+    .kakao-mini-inner {
+      background: var(--white); border-radius: 6px; padding: 12px;
+      font-size: 0.75rem; line-height: 1.6; color: var(--charcoal);
+    }
+    .kakao-mini-title { font-weight: 700; margin-bottom: 6px; font-size: 0.8rem; }
+
+    /* Toast */
+    .admin-toast {
+      position: fixed; bottom: -80px; left: 50%; transform: translateX(-50%);
+      padding: 14px 28px; border-radius: var(--radius-md); font-weight: 600;
+      font-size: 0.95rem; box-shadow: var(--shadow-lg);
+      transition: bottom 0.3s ease; z-index: 3000; color: white;
+    }
+
+    @media (max-width: 768px) {
+      .admin-sidebar { display: none; }
+      .admin-main { padding: 16px; }
+      .admin-stats { grid-template-columns: repeat(2, 1fr); }
+      .detail-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Nav -->
+  <nav class="nav scrolled">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <span class="steam">~</span> 모락
+        <span style="font-size:0.75rem;font-weight:500;color:var(--red);margin-left:8px;padding:2px 8px;background:rgba(231,76,60,0.15);border-radius:6px;">ADMIN</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">홈</a>
+        <a href="admin.html" class="active">관리자</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <button class="admin-sidebar-item active" onclick="showAdminPanel('applications',this)">
+        &#128203; 입점 심사
+        <span class="admin-sidebar-badge" id="pendingCount">3</span>
+      </button>
+      <button class="admin-sidebar-item" onclick="showAdminPanel('approved',this)">
+        &#9989; 승인 완료
+      </button>
+      <button class="admin-sidebar-item" onclick="showAdminPanel('rejected',this)">
+        &#10060; 거절 내역
+      </button>
+      <button class="admin-sidebar-item" onclick="showAdminPanel('orders',this)">
+        &#128230; 전체 주문
+      </button>
+      <button class="admin-sidebar-item" onclick="showAdminPanel('settings',this)">
+        &#9881; 알림 설정
+      </button>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main">
+
+      <!-- ===== Applications Panel ===== -->
+      <div class="admin-panel active" id="panel-applications">
+        <h2 style="color:var(--white);margin-bottom:24px;">&#128203; 입점 심사</h2>
+
+        <!-- Stats -->
+        <div class="admin-stats">
+          <div class="a-stat">
+            <div class="a-stat-val" id="statPending">3</div>
+            <div class="a-stat-label">대기 중</div>
+          </div>
+          <div class="a-stat">
+            <div class="a-stat-val">12</div>
+            <div class="a-stat-label">승인 완료</div>
+          </div>
+          <div class="a-stat">
+            <div class="a-stat-val">2</div>
+            <div class="a-stat-label">거절</div>
+          </div>
+          <div class="a-stat">
+            <div class="a-stat-val">50</div>
+            <div class="a-stat-label">총 등록 상점</div>
+          </div>
+        </div>
+
+        <!-- Application Cards -->
+        <div id="applicationList">
+          <!-- Card 1 -->
+          <div class="app-card" id="app-1">
+            <div class="app-card-header" onclick="toggleCard('app-1')">
+              <div class="app-card-left">
+                <div class="app-card-avatar">&#127841;</div>
+                <div>
+                  <div class="app-card-name">포항건강도시락</div>
+                  <div class="app-card-meta">도시락 &middot; 효자동 &middot; 김사장</div>
+                </div>
+              </div>
+              <div class="app-card-right">
+                <span class="badge badge-orange">대기중</span>
+                <span class="app-card-time">30분 전</span>
+              </div>
+            </div>
+            <div class="app-card-detail">
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <div class="detail-label">상호명</div>
+                  <div class="detail-value">포항건강도시락</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">사업자번호</div>
+                  <div class="detail-value">123-45-67890</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">대표자</div>
+                  <div class="detail-value">김사장</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">연락처</div>
+                  <div class="detail-value">010-9876-5432</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">주소</div>
+                  <div class="detail-value">포항시 남구 효자동 456-7</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">이메일</div>
+                  <div class="detail-value">healthy@pohang.kr</div>
+                </div>
+                <div class="detail-item detail-full">
+                  <div class="detail-label">대표 메뉴</div>
+                  <div class="detail-value">건강 도시락 (6,500원), 저염 도시락 (7,000원)</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">서비스 유형</div>
+                  <div class="detail-tags">
+                    <span class="detail-tag">단체주문</span>
+                    <span class="detail-tag">정기구독</span>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">배달 방식</div>
+                  <div class="detail-value">직접 배달 (3,000원)</div>
+                </div>
+                <div class="detail-item detail-full">
+                  <div class="detail-label">배달 가능 지역</div>
+                  <div class="detail-tags">
+                    <span class="detail-tag">남구</span>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">배달 요일</div>
+                  <div class="detail-value">월~금</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">최소 주문</div>
+                  <div class="detail-value">5인 이상</div>
+                </div>
+                <div class="detail-item detail-full">
+                  <div class="detail-label">가게 소개</div>
+                  <div class="detail-value" style="line-height:1.6;">매일 아침 신선한 재료로 정성껏 만드는 건강 도시락 전문점입니다. 저염식, 다이어트식 맞춤 주문이 가능하며 포항 지역 직접 배달합니다.</div>
+                </div>
+                <div class="detail-item detail-full">
+                  <div class="detail-label">위생허가증</div>
+                  <div class="detail-value" style="color:var(--green);">&#9989; 업로드됨</div>
+                </div>
+              </div>
+              <div class="detail-actions">
+                <button class="btn btn-success" onclick="approveApp('app-1', '포항건강도시락')">&#9989; 승인하기</button>
+                <button class="btn btn-danger" onclick="rejectApp('app-1', '포항건강도시락')">&#10060; 거절하기</button>
+                <button class="btn btn-ghost" style="color:var(--gray-400);">&#128172; 메모 남기기</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="app-card" id="app-2">
+            <div class="app-card-header" onclick="toggleCard('app-2')">
+              <div class="app-card-left">
+                <div class="app-card-avatar">&#9749;</div>
+                <div>
+                  <div class="app-card-name">양덕 카페라떼</div>
+                  <div class="app-card-meta">커피/음료 &middot; 양덕동 &middot; 박바리스타</div>
+                </div>
+              </div>
+              <div class="app-card-right">
+                <span class="badge badge-orange">대기중</span>
+                <span class="app-card-time">2시간 전</span>
+              </div>
+            </div>
+            <div class="app-card-detail">
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <div class="detail-label">상호명</div>
+                  <div class="detail-value">양덕 카페라떼</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">사업자번호</div>
+                  <div class="detail-value">234-56-78901</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">대표자</div>
+                  <div class="detail-value">박바리스타</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">연락처</div>
+                  <div class="detail-value">010-1111-2222</div>
+                </div>
+                <div class="detail-item detail-full">
+                  <div class="detail-label">대표 메뉴</div>
+                  <div class="detail-value">아메리카노 (3,000원), 카페라떼 (3,800원), 커피 10잔 세트 (27,000원)</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">서비스 유형</div>
+                  <div class="detail-tags">
+                    <span class="detail-tag">단체주문</span>
+                    <span class="detail-tag">정기구독</span>
+                  </div>
+                </div>
+                <div class="detail-item detail-full">
+                  <div class="detail-label">배달 가능 지역</div>
+                  <div class="detail-tags">
+                    <span class="detail-tag">남구</span>
+                  </div>
+                </div>
+                <div class="detail-item detail-full">
+                  <div class="detail-label">가게 소개</div>
+                  <div class="detail-value" style="line-height:1.6;">직접 로스팅한 스페셜티 원두로 내리는 커피 전문점. 사무실 단체 커피 배달, 회의용 커피 세트, 커피 정기구독 가능합니다.</div>
+                </div>
+                <div class="detail-item detail-full">
+                  <div class="detail-label">위생허가증</div>
+                  <div class="detail-value" style="color:var(--yellow);">&#9888; 미업로드</div>
+                </div>
+              </div>
+              <div class="detail-actions">
+                <button class="btn btn-success" onclick="approveApp('app-2', '양덕 카페라떼')">&#9989; 승인하기</button>
+                <button class="btn btn-danger" onclick="rejectApp('app-2', '양덕 카페라떼')">&#10060; 거절하기</button>
+                <button class="btn btn-ghost" style="color:var(--gray-400);">&#128172; 메모 남기기</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="app-card" id="app-3">
+            <div class="app-card-header" onclick="toggleCard('app-3')">
+              <div class="app-card-left">
+                <div class="app-card-avatar">&#127856;</div>
+                <div>
+                  <div class="app-card-name">효자동 떡집</div>
+                  <div class="app-card-meta">다과/디저트 &middot; 효자동 &middot; 최떡장인</div>
+                </div>
+              </div>
+              <div class="app-card-right">
+                <span class="badge badge-orange">대기중</span>
+                <span class="app-card-time">5시간 전</span>
+              </div>
+            </div>
+            <div class="app-card-detail">
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <div class="detail-label">상호명</div>
+                  <div class="detail-value">효자동 떡집</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">사업자번호</div>
+                  <div class="detail-value">345-67-89012</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">대표자</div>
+                  <div class="detail-value">최떡장인</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">연락처</div>
+                  <div class="detail-value">010-3333-4444</div>
+                </div>
+                <div class="detail-item detail-full">
+                  <div class="detail-label">대표 메뉴</div>
+                  <div class="detail-value">떡 선물세트 (25,000원), 행사용 떡 (인당 5,000원), 떡케이크 (35,000원)</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">서비스 유형</div>
+                  <div class="detail-tags"><span class="detail-tag">단체주문</span></div>
+                </div>
+                <div class="detail-item detail-full">
+                  <div class="detail-label">배달 가능 지역</div>
+                  <div class="detail-tags">
+                    <span class="detail-tag">남구</span>
+                    <span class="detail-tag">북구</span>
+                  </div>
+                </div>
+                <div class="detail-item detail-full">
+                  <div class="detail-label">가게 소개</div>
+                  <div class="detail-value" style="line-height:1.6;">3대째 이어온 전통 떡집. 행사용 떡, 돌잔치 떡, 답례품 떡을 주문 제작합니다. 주문 후 당일 제조, 신선한 떡을 배달합니다.</div>
+                </div>
+                <div class="detail-item detail-full">
+                  <div class="detail-label">위생허가증</div>
+                  <div class="detail-value" style="color:var(--green);">&#9989; 업로드됨</div>
+                </div>
+              </div>
+              <div class="detail-actions">
+                <button class="btn btn-success" onclick="approveApp('app-3', '효자동 떡집')">&#9989; 승인하기</button>
+                <button class="btn btn-danger" onclick="rejectApp('app-3', '효자동 떡집')">&#10060; 거절하기</button>
+                <button class="btn btn-ghost" style="color:var(--gray-400);">&#128172; 메모 남기기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Approved Panel ===== -->
+      <div class="admin-panel" id="panel-approved">
+        <h2 style="color:var(--white);margin-bottom:24px;">&#9989; 승인 완료 상점</h2>
+        <div id="approvedList">
+          <div class="status-card">
+            <div class="status-card-left">
+              <div class="app-card-avatar" style="width:36px;height:36px;font-size:1rem;">&#127841;</div>
+              <div>
+                <div class="status-card-name">남구분식당</div>
+                <div class="status-card-meta">한식 도시락 &middot; 승인일: 2026.03.15</div>
+              </div>
+            </div>
+            <span class="badge badge-green">운영중</span>
+          </div>
+          <div class="status-card">
+            <div class="status-card-left">
+              <div class="app-card-avatar" style="width:36px;height:36px;font-size:1rem;">&#9749;</div>
+              <div>
+                <div class="status-card-name">포항로스터즈</div>
+                <div class="status-card-meta">커피/음료 &middot; 승인일: 2026.03.12</div>
+              </div>
+            </div>
+            <span class="badge badge-green">운영중</span>
+          </div>
+          <div class="status-card">
+            <div class="status-card-left">
+              <div class="app-card-avatar" style="width:36px;height:36px;font-size:1rem;">&#127856;</div>
+              <div>
+                <div class="status-card-name">달콤베이커리</div>
+                <div class="status-card-meta">다과/디저트 &middot; 승인일: 2026.03.10</div>
+              </div>
+            </div>
+            <span class="badge badge-green">운영중</span>
+          </div>
+          <div class="status-card">
+            <div class="status-card-left">
+              <div class="app-card-avatar" style="width:36px;height:36px;font-size:1rem;">&#129367;</div>
+              <div>
+                <div class="status-card-name">건강한밥상</div>
+                <div class="status-card-meta">건강 도시락 &middot; 승인일: 2026.03.08</div>
+              </div>
+            </div>
+            <span class="badge badge-green">운영중</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Rejected Panel ===== -->
+      <div class="admin-panel" id="panel-rejected">
+        <h2 style="color:var(--white);margin-bottom:24px;">&#10060; 거절 내역</h2>
+        <div id="rejectedList">
+          <div class="status-card">
+            <div class="status-card-left">
+              <div class="app-card-avatar" style="width:36px;height:36px;font-size:1rem;">&#127829;</div>
+              <div>
+                <div class="status-card-name">XX분식</div>
+                <div class="status-card-meta">거절일: 2026.03.20 &middot; 사유: 위생허가증 미제출</div>
+              </div>
+            </div>
+            <span class="badge badge-red">거절됨</span>
+          </div>
+          <div class="status-card">
+            <div class="status-card-left">
+              <div class="app-card-avatar" style="width:36px;height:36px;font-size:1rem;">&#127833;</div>
+              <div>
+                <div class="status-card-name">OO파스타</div>
+                <div class="status-card-meta">거절일: 2026.03.18 &middot; 사유: 사업자번호 불일치</div>
+              </div>
+            </div>
+            <span class="badge badge-red">거절됨</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Orders Overview Panel ===== -->
+      <div class="admin-panel" id="panel-orders">
+        <h2 style="color:var(--white);margin-bottom:24px;">&#128230; 전체 주문 현황</h2>
+        <div class="admin-stats">
+          <div class="a-stat">
+            <div class="a-stat-val">156</div>
+            <div class="a-stat-label">총 주문</div>
+          </div>
+          <div class="a-stat">
+            <div class="a-stat-val">23</div>
+            <div class="a-stat-label">이번 주</div>
+          </div>
+          <div class="a-stat">
+            <div class="a-stat-val">18</div>
+            <div class="a-stat-label">구독 활성</div>
+          </div>
+          <div class="a-stat">
+            <div class="a-stat-val" style="font-size:1.4rem;">12,450,000</div>
+            <div class="a-stat-label">총 거래액</div>
+          </div>
+        </div>
+        <div class="status-card">
+          <div class="status-card-left">
+            <div>
+              <div class="status-card-name">한식 도시락 25개</div>
+              <div class="status-card-meta">포항건강도시락 &rarr; 김민지 (포항테크) &middot; 4/2 12:00</div>
+            </div>
+          </div>
+          <span class="badge badge-orange">수락대기</span>
+        </div>
+        <div class="status-card">
+          <div class="status-card-left">
+            <div>
+              <div class="status-card-name">커피 구독 (주 3회)</div>
+              <div class="status-card-meta">포항로스터즈 &rarr; 이서준 (포스코) &middot; 정기구독</div>
+            </div>
+          </div>
+          <span class="badge badge-green">구독중</span>
+        </div>
+        <div class="status-card">
+          <div class="status-card-left">
+            <div>
+              <div class="status-card-name">워크샵 다과 세트 15인</div>
+              <div class="status-card-meta">달콤베이커리 &rarr; 박지영 (한동대) &middot; 4/5 14:00</div>
+            </div>
+          </div>
+          <span class="badge badge-blue">준비중</span>
+        </div>
+        <div class="status-card">
+          <div class="status-card-left">
+            <div>
+              <div class="status-card-name">한식 도시락 20개</div>
+              <div class="status-card-meta">남구분식당 &rarr; 김민지 (포항테크) &middot; 3/28</div>
+            </div>
+          </div>
+          <span class="badge badge-green">완료</span>
+        </div>
+      </div>
+
+      <!-- ===== Settings Panel ===== -->
+      <div class="admin-panel" id="panel-settings">
+        <h2 style="color:var(--white);margin-bottom:24px;">&#9881; 알림 설정</h2>
+        <div style="background:#1A1A1A;border-radius:var(--radius-md);border:1px solid #2A2A2A;padding:24px;max-width:600px;">
+          <div class="admin-notif">
+            <div>
+              <div class="admin-notif-label">신규 입점 신청 알림</div>
+              <div class="admin-notif-desc">새로운 입점 신청이 들어오면 카톡 알림</div>
+            </div>
+            <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="admin-notif">
+            <div>
+              <div class="admin-notif-label">단체주문 알림</div>
+              <div class="admin-notif-desc">새로운 단체주문 발생 시 알림</div>
+            </div>
+            <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="admin-notif">
+            <div>
+              <div class="admin-notif-label">주문 미응답 경고</div>
+              <div class="admin-notif-desc">사장님 미응답 주문 1시간 경과 시 알림</div>
+            </div>
+            <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="admin-notif">
+            <div>
+              <div class="admin-notif-label">위생허가증 미제출 알림</div>
+              <div class="admin-notif-desc">위생허가증 없는 신청 시 별도 표시</div>
+            </div>
+            <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="admin-notif">
+            <div>
+              <div class="admin-notif-label">주간 리포트</div>
+              <div class="admin-notif-desc">매주 월요일 전체 현황 요약 발송</div>
+            </div>
+            <button class="toggle" onclick="this.classList.toggle('on')"></button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Reject Modal -->
+  <div class="modal-overlay" id="adminRejectModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>입점 거절 사유</h3>
+        <button class="modal-close" onclick="closeAdminReject()">&times;</button>
+      </div>
+      <p style="font-size:0.9rem;color:var(--gray-500);margin-bottom:16px;">
+        거절 사유는 사장님에게 카카오톡으로 전달됩니다.
+      </p>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <label class="reject-reason" onclick="selectAdminReject(this)">
+          <input type="radio" name="adminReject"> 위생허가증 미제출
+        </label>
+        <label class="reject-reason" onclick="selectAdminReject(this)">
+          <input type="radio" name="adminReject"> 사업자번호 불일치
+        </label>
+        <label class="reject-reason" onclick="selectAdminReject(this)">
+          <input type="radio" name="adminReject"> 배달 가능 지역 확인 필요
+        </label>
+        <label class="reject-reason" onclick="selectAdminReject(this)">
+          <input type="radio" name="adminReject"> 기타 (직접 입력)
+        </label>
+      </div>
+      <textarea class="form-textarea" placeholder="추가 메시지 (선택)" rows="2" style="margin-top:12px;"></textarea>
+
+      <!-- Kakao preview -->
+      <div class="kakao-mini">
+        <div class="kakao-mini-inner">
+          <div class="kakao-mini-title">[모락] 입점 신청 결과 안내</div>
+          <span id="rejectStoreName">상점</span> 사장님, 안녕하세요.<br>
+          검토 결과 아쉽게도 이번 신청은 승인되지 않았습니다.<br><br>
+          사유: 위생허가증 미제출<br><br>
+          서류 보완 후 재신청 가능합니다.<br>
+          <div style="text-align:center;padding:8px;background:#F9E000;border-radius:6px;margin-top:10px;font-weight:600;font-size:0.75rem;">재신청하기</div>
+        </div>
+      </div>
+
+      <button class="btn btn-danger btn-full mt-16" onclick="confirmAdminReject()">거절 확정</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="admin-toast" id="adminToast"></div>
+
+  <script>
+    let currentRejectId = null;
+    let currentRejectName = '';
+
+    // Panel navigation
+    function showAdminPanel(name, btn) {
+      document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + name).classList.add('active');
+      document.querySelectorAll('.admin-sidebar-item').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    // Toggle card expand
+    function toggleCard(id) {
+      const card = document.getElementById(id);
+      card.classList.toggle('expanded');
+    }
+
+    // Approve
+    function approveApp(id, name) {
+      const card = document.getElementById(id);
+      card.style.transition = 'all 0.5s ease';
+      card.style.transform = 'translateX(100%)';
+      card.style.opacity = '0';
+      setTimeout(() => {
+        card.remove();
+        updatePendingCount();
+        // Add to approved list
+        const approvedList = document.getElementById('approvedList');
+        const item = document.createElement('div');
+        item.className = 'status-card';
+        item.style.animation = 'fadeIn 0.3s ease';
+        item.innerHTML = `
+          <div class="status-card-left">
+            <div class="app-card-avatar" style="width:36px;height:36px;font-size:1rem;">&#127881;</div>
+            <div>
+              <div class="status-card-name">${name}</div>
+              <div class="status-card-meta">방금 승인됨</div>
+            </div>
+          </div>
+          <span class="badge badge-green">운영중</span>
+        `;
+        approvedList.prepend(item);
+      }, 500);
+      showAdminToast('&#9989; ' + name + ' 승인 완료! 사장님에게 카톡 알림이 전송됩니다.', 'var(--green)');
+    }
+
+    // Reject
+    function rejectApp(id, name) {
+      currentRejectId = id;
+      currentRejectName = name;
+      document.getElementById('rejectStoreName').textContent = name;
+      document.getElementById('adminRejectModal').classList.add('show');
+    }
+
+    function closeAdminReject() {
+      document.getElementById('adminRejectModal').classList.remove('show');
+    }
+
+    function selectAdminReject(el) {
+      el.parentElement.querySelectorAll('.reject-reason').forEach(r => r.classList.remove('selected'));
+      el.classList.add('selected');
+      el.querySelector('input').checked = true;
+    }
+
+    function confirmAdminReject() {
+      closeAdminReject();
+      const card = document.getElementById(currentRejectId);
+      card.style.transition = 'all 0.5s ease';
+      card.style.transform = 'translateX(-100%)';
+      card.style.opacity = '0';
+      setTimeout(() => {
+        card.remove();
+        updatePendingCount();
+      }, 500);
+      showAdminToast('&#10060; ' + currentRejectName + ' 거절 완료. 사장님에게 카톡 알림이 전송됩니다.', 'var(--red)');
+    }
+
+    function updatePendingCount() {
+      const remaining = document.querySelectorAll('#applicationList .app-card').length;
+      document.getElementById('pendingCount').textContent = remaining;
+      document.getElementById('statPending').textContent = remaining;
+    }
+
+    // Toast
+    function showAdminToast(msg, color) {
+      const toast = document.getElementById('adminToast');
+      toast.innerHTML = msg;
+      toast.style.background = color;
+      toast.style.bottom = '32px';
+      setTimeout(() => { toast.style.bottom = '-80px'; }, 3000);
+    }
+  </script>
+
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</body>
+</html>
