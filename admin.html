@@ -184,242 +184,29 @@
         <!-- Stats -->
         <div class="admin-stats">
           <div class="a-stat">
-            <div class="a-stat-val" id="statPending">3</div>
+            <div class="a-stat-val" id="statPending">0</div>
             <div class="a-stat-label">대기 중</div>
           </div>
           <div class="a-stat">
-            <div class="a-stat-val">12</div>
+            <div class="a-stat-val" id="statApproved">0</div>
             <div class="a-stat-label">승인 완료</div>
           </div>
           <div class="a-stat">
-            <div class="a-stat-val">2</div>
+            <div class="a-stat-val" id="statRejected">0</div>
             <div class="a-stat-label">거절</div>
           </div>
           <div class="a-stat">
-            <div class="a-stat-val">50</div>
+            <div class="a-stat-val" id="statTotal">0</div>
             <div class="a-stat-label">총 등록 상점</div>
           </div>
         </div>
 
         <!-- Application Cards -->
         <div id="applicationList">
-          <!-- Card 1 -->
-          <div class="app-card" id="app-1">
-            <div class="app-card-header" onclick="toggleCard('app-1')">
-              <div class="app-card-left">
-                <div class="app-card-avatar">&#127841;</div>
-                <div>
-                  <div class="app-card-name">포항건강도시락</div>
-                  <div class="app-card-meta">도시락 &middot; 효자동 &middot; 김사장</div>
-                </div>
-              </div>
-              <div class="app-card-right">
-                <span class="badge badge-orange">대기중</span>
-                <span class="app-card-time">30분 전</span>
-              </div>
-            </div>
-            <div class="app-card-detail">
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <div class="detail-label">상호명</div>
-                  <div class="detail-value">포항건강도시락</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">사업자번호</div>
-                  <div class="detail-value">123-45-67890</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">대표자</div>
-                  <div class="detail-value">김사장</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">연락처</div>
-                  <div class="detail-value">010-9876-5432</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">주소</div>
-                  <div class="detail-value">포항시 남구 효자동 456-7</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">이메일</div>
-                  <div class="detail-value">healthy@pohang.kr</div>
-                </div>
-                <div class="detail-item detail-full">
-                  <div class="detail-label">대표 메뉴</div>
-                  <div class="detail-value">건강 도시락 (6,500원), 저염 도시락 (7,000원)</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">서비스 유형</div>
-                  <div class="detail-tags">
-                    <span class="detail-tag">단체주문</span>
-                    <span class="detail-tag">정기구독</span>
-                  </div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">배달 방식</div>
-                  <div class="detail-value">직접 배달 (3,000원)</div>
-                </div>
-                <div class="detail-item detail-full">
-                  <div class="detail-label">배달 가능 지역</div>
-                  <div class="detail-tags">
-                    <span class="detail-tag">남구</span>
-                  </div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">배달 요일</div>
-                  <div class="detail-value">월~금</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">최소 주문</div>
-                  <div class="detail-value">5인 이상</div>
-                </div>
-                <div class="detail-item detail-full">
-                  <div class="detail-label">가게 소개</div>
-                  <div class="detail-value" style="line-height:1.6;">매일 아침 신선한 재료로 정성껏 만드는 건강 도시락 전문점입니다. 저염식, 다이어트식 맞춤 주문이 가능하며 포항 지역 직접 배달합니다.</div>
-                </div>
-                <div class="detail-item detail-full">
-                  <div class="detail-label">위생허가증</div>
-                  <div class="detail-value" style="color:var(--green);">&#9989; 업로드됨</div>
-                </div>
-              </div>
-              <div class="detail-actions">
-                <button class="btn btn-success" onclick="approveApp('app-1', '포항건강도시락')">&#9989; 승인하기</button>
-                <button class="btn btn-danger" onclick="rejectApp('app-1', '포항건강도시락')">&#10060; 거절하기</button>
-                <button class="btn btn-ghost" style="color:var(--gray-400);">&#128172; 메모 남기기</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card 2 -->
-          <div class="app-card" id="app-2">
-            <div class="app-card-header" onclick="toggleCard('app-2')">
-              <div class="app-card-left">
-                <div class="app-card-avatar">&#9749;</div>
-                <div>
-                  <div class="app-card-name">양덕 카페라떼</div>
-                  <div class="app-card-meta">커피/음료 &middot; 양덕동 &middot; 박바리스타</div>
-                </div>
-              </div>
-              <div class="app-card-right">
-                <span class="badge badge-orange">대기중</span>
-                <span class="app-card-time">2시간 전</span>
-              </div>
-            </div>
-            <div class="app-card-detail">
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <div class="detail-label">상호명</div>
-                  <div class="detail-value">양덕 카페라떼</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">사업자번호</div>
-                  <div class="detail-value">234-56-78901</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">대표자</div>
-                  <div class="detail-value">박바리스타</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">연락처</div>
-                  <div class="detail-value">010-1111-2222</div>
-                </div>
-                <div class="detail-item detail-full">
-                  <div class="detail-label">대표 메뉴</div>
-                  <div class="detail-value">아메리카노 (3,000원), 카페라떼 (3,800원), 커피 10잔 세트 (27,000원)</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">서비스 유형</div>
-                  <div class="detail-tags">
-                    <span class="detail-tag">단체주문</span>
-                    <span class="detail-tag">정기구독</span>
-                  </div>
-                </div>
-                <div class="detail-item detail-full">
-                  <div class="detail-label">배달 가능 지역</div>
-                  <div class="detail-tags">
-                    <span class="detail-tag">남구</span>
-                  </div>
-                </div>
-                <div class="detail-item detail-full">
-                  <div class="detail-label">가게 소개</div>
-                  <div class="detail-value" style="line-height:1.6;">직접 로스팅한 스페셜티 원두로 내리는 커피 전문점. 사무실 단체 커피 배달, 회의용 커피 세트, 커피 정기구독 가능합니다.</div>
-                </div>
-                <div class="detail-item detail-full">
-                  <div class="detail-label">위생허가증</div>
-                  <div class="detail-value" style="color:var(--yellow);">&#9888; 미업로드</div>
-                </div>
-              </div>
-              <div class="detail-actions">
-                <button class="btn btn-success" onclick="approveApp('app-2', '양덕 카페라떼')">&#9989; 승인하기</button>
-                <button class="btn btn-danger" onclick="rejectApp('app-2', '양덕 카페라떼')">&#10060; 거절하기</button>
-                <button class="btn btn-ghost" style="color:var(--gray-400);">&#128172; 메모 남기기</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card 3 -->
-          <div class="app-card" id="app-3">
-            <div class="app-card-header" onclick="toggleCard('app-3')">
-              <div class="app-card-left">
-                <div class="app-card-avatar">&#127856;</div>
-                <div>
-                  <div class="app-card-name">효자동 떡집</div>
-                  <div class="app-card-meta">다과/디저트 &middot; 효자동 &middot; 최떡장인</div>
-                </div>
-              </div>
-              <div class="app-card-right">
-                <span class="badge badge-orange">대기중</span>
-                <span class="app-card-time">5시간 전</span>
-              </div>
-            </div>
-            <div class="app-card-detail">
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <div class="detail-label">상호명</div>
-                  <div class="detail-value">효자동 떡집</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">사업자번호</div>
-                  <div class="detail-value">345-67-89012</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">대표자</div>
-                  <div class="detail-value">최떡장인</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">연락처</div>
-                  <div class="detail-value">010-3333-4444</div>
-                </div>
-                <div class="detail-item detail-full">
-                  <div class="detail-label">대표 메뉴</div>
-                  <div class="detail-value">떡 선물세트 (25,000원), 행사용 떡 (인당 5,000원), 떡케이크 (35,000원)</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">서비스 유형</div>
-                  <div class="detail-tags"><span class="detail-tag">단체주문</span></div>
-                </div>
-                <div class="detail-item detail-full">
-                  <div class="detail-label">배달 가능 지역</div>
-                  <div class="detail-tags">
-                    <span class="detail-tag">남구</span>
-                    <span class="detail-tag">북구</span>
-                  </div>
-                </div>
-                <div class="detail-item detail-full">
-                  <div class="detail-label">가게 소개</div>
-                  <div class="detail-value" style="line-height:1.6;">3대째 이어온 전통 떡집. 행사용 떡, 돌잔치 떡, 답례품 떡을 주문 제작합니다. 주문 후 당일 제조, 신선한 떡을 배달합니다.</div>
-                </div>
-                <div class="detail-item detail-full">
-                  <div class="detail-label">위생허가증</div>
-                  <div class="detail-value" style="color:var(--green);">&#9989; 업로드됨</div>
-                </div>
-              </div>
-              <div class="detail-actions">
-                <button class="btn btn-success" onclick="approveApp('app-3', '효자동 떡집')">&#9989; 승인하기</button>
-                <button class="btn btn-danger" onclick="rejectApp('app-3', '효자동 떡집')">&#10060; 거절하기</button>
-                <button class="btn btn-ghost" style="color:var(--gray-400);">&#128172; 메모 남기기</button>
-              </div>
-            </div>
+          <div style="text-align:center;padding:60px 0;color:var(--gray-500);">
+            <div style="font-size:2.5rem;margin-bottom:12px;">📋</div>
+            <div style="font-weight:600;font-size:1rem;">대기 중인 입점 신청이 없습니다</div>
+            <div style="font-size:0.85rem;margin-top:8px;opacity:0.7;">상점이 입점 신청을 하면 여기에 표시됩니다</div>
           </div>
         </div>
       </div>
@@ -428,45 +215,10 @@
       <div class="admin-panel" id="panel-approved">
         <h2 style="color:var(--white);margin-bottom:24px;">&#9989; 승인 완료 상점</h2>
         <div id="approvedList">
-          <div class="status-card">
-            <div class="status-card-left">
-              <div class="app-card-avatar" style="width:36px;height:36px;font-size:1rem;">&#127841;</div>
-              <div>
-                <div class="status-card-name">남구분식당</div>
-                <div class="status-card-meta">한식 도시락 &middot; 승인일: 2026.03.15</div>
-              </div>
-            </div>
-            <span class="badge badge-green">운영중</span>
-          </div>
-          <div class="status-card">
-            <div class="status-card-left">
-              <div class="app-card-avatar" style="width:36px;height:36px;font-size:1rem;">&#9749;</div>
-              <div>
-                <div class="status-card-name">포항로스터즈</div>
-                <div class="status-card-meta">커피/음료 &middot; 승인일: 2026.03.12</div>
-              </div>
-            </div>
-            <span class="badge badge-green">운영중</span>
-          </div>
-          <div class="status-card">
-            <div class="status-card-left">
-              <div class="app-card-avatar" style="width:36px;height:36px;font-size:1rem;">&#127856;</div>
-              <div>
-                <div class="status-card-name">달콤베이커리</div>
-                <div class="status-card-meta">다과/디저트 &middot; 승인일: 2026.03.10</div>
-              </div>
-            </div>
-            <span class="badge badge-green">운영중</span>
-          </div>
-          <div class="status-card">
-            <div class="status-card-left">
-              <div class="app-card-avatar" style="width:36px;height:36px;font-size:1rem;">&#129367;</div>
-              <div>
-                <div class="status-card-name">건강한밥상</div>
-                <div class="status-card-meta">건강 도시락 &middot; 승인일: 2026.03.08</div>
-              </div>
-            </div>
-            <span class="badge badge-green">운영중</span>
+          <div style="text-align:center;padding:60px 0;color:var(--gray-500);">
+            <div style="font-size:2.5rem;margin-bottom:12px;">🏪</div>
+            <div style="font-weight:600;font-size:1rem;">승인된 상점이 없습니다</div>
+            <div style="font-size:0.85rem;margin-top:8px;opacity:0.7;">입점 신청을 승인하면 여기에 표시됩니다</div>
           </div>
         </div>
       </div>
@@ -475,25 +227,9 @@
       <div class="admin-panel" id="panel-rejected">
         <h2 style="color:var(--white);margin-bottom:24px;">&#10060; 거절 내역</h2>
         <div id="rejectedList">
-          <div class="status-card">
-            <div class="status-card-left">
-              <div class="app-card-avatar" style="width:36px;height:36px;font-size:1rem;">&#127829;</div>
-              <div>
-                <div class="status-card-name">XX분식</div>
-                <div class="status-card-meta">거절일: 2026.03.20 &middot; 사유: 위생허가증 미제출</div>
-              </div>
-            </div>
-            <span class="badge badge-red">거절됨</span>
-          </div>
-          <div class="status-card">
-            <div class="status-card-left">
-              <div class="app-card-avatar" style="width:36px;height:36px;font-size:1rem;">&#127833;</div>
-              <div>
-                <div class="status-card-name">OO파스타</div>
-                <div class="status-card-meta">거절일: 2026.03.18 &middot; 사유: 사업자번호 불일치</div>
-              </div>
-            </div>
-            <span class="badge badge-red">거절됨</span>
+          <div style="text-align:center;padding:60px 0;color:var(--gray-500);">
+            <div style="font-size:2.5rem;margin-bottom:12px;">📭</div>
+            <div style="font-weight:600;font-size:1rem;">거절 내역이 없습니다</div>
           </div>
         </div>
       </div>
