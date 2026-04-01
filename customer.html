@@ -580,7 +580,7 @@
         id: s.id,
         name: s.store_name,
         cat: s.category,
-        emoji: '🏪',
+        photo_url: s.photo_url || null,
         rating: '-',
         reviews: 0,
         price: s.menus?.[0] ? parseInt(s.menus[0].price?.replace(/[^0-9]/g,'') || 0).toLocaleString() + '원~' : '-',
@@ -636,8 +636,8 @@
         const realIdx = stores.indexOf(s);
         return `
         <div class="store-card" onclick="openOrderModal(${realIdx})">
-          <div class="store-img">
-            ${s.emoji}
+          <div class="store-img" style="${s.photo_url ? `background-image:url('${s.photo_url}');background-size:cover;background-position:center;` : ''}">
+            ${s.photo_url ? '' : '🏪'}
             <div class="store-badges">
               ${s.tags.includes('구독가능') ? '<span class="badge badge-orange">구독가능</span>' : ''}
               ${s.tags.includes('소규모OK') ? '<span class="badge badge-green">소규모OK</span>' : ''}
