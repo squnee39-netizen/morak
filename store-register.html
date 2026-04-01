@@ -168,33 +168,33 @@
         <h3 style="margin-bottom:24px;">&#128203; 기본 정보</h3>
         <div class="form-group">
           <label class="form-label">상호명 *</label>
-          <input class="form-input" placeholder="예: 남구분식당" id="storeName" value="포항건강도시락">
+          <input class="form-input" placeholder="예: 남구분식당" id="storeName">
         </div>
         <div class="form-group">
           <label class="form-label">사업자등록번호 *</label>
-          <input class="form-input" placeholder="000-00-00000" value="123-45-67890">
+          <input class="form-input" placeholder="000-00-00000" id="businessNumber">
         </div>
         <div class="grid-2">
           <div class="form-group">
             <label class="form-label">대표자명 *</label>
-            <input class="form-input" placeholder="홍길동" value="김사장">
+            <input class="form-input" placeholder="홍길동" id="ownerName">
           </div>
           <div class="form-group">
             <label class="form-label">연락처 *</label>
-            <input class="form-input" placeholder="010-0000-0000" value="010-9876-5432">
+            <input class="form-input" placeholder="010-0000-0000" id="phone">
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">이메일</label>
-          <input class="form-input" type="email" placeholder="email@example.com" value="healthy@pohang.kr">
+          <input class="form-input" type="email" placeholder="email@example.com" id="email">
         </div>
         <div class="form-group">
           <label class="form-label">가게 주소 *</label>
-          <input class="form-input" placeholder="포항시 남구 ..." value="포항시 남구 효자동 456-7">
+          <input class="form-input" placeholder="포항시 남구 ..." id="address">
         </div>
         <div class="form-group">
           <label class="form-label">업종 카테고리 *</label>
-          <select class="form-select">
+          <select class="form-select" id="category">
             <option>케이터링</option>
             <option>한식</option>
             <option>커피/디저트</option>
@@ -287,11 +287,11 @@
         <div class="grid-2" style="margin-top:16px;">
           <div class="form-group">
             <label class="form-label">배달비</label>
-            <input class="form-input" type="number" value="3000" placeholder="원">
+            <input class="form-input" type="number" placeholder="원" id="deliveryFee">
           </div>
           <div class="form-group">
             <label class="form-label">최소 주문 인원</label>
-            <input class="form-input" type="number" value="5" placeholder="명">
+            <input class="form-input" type="number" placeholder="명" id="minOrder">
           </div>
         </div>
 
@@ -308,7 +308,7 @@
         <h3 style="margin-bottom:24px;">&#128247; 소개 & 사진</h3>
         <div class="form-group">
           <label class="form-label">가게 소개글 *</label>
-          <textarea class="form-textarea" rows="4" placeholder="가게의 특징, 주력 메뉴, 강점 등을 자유롭게 작성해주세요.">매일 아침 신선한 재료로 정성껏 만드는 건강 도시락 전문점입니다. 저염식, 다이어트식 맞춤 주문이 가능하며 포항 지역 직접 배달합니다. 10년 경력의 영양사가 직접 식단을 설계합니다.</textarea>
+          <textarea class="form-textarea" rows="4" placeholder="가게의 특징, 주력 메뉴, 강점 등을 자유롭게 작성해주세요." id="description"></textarea>
           <div class="form-hint">최소 50자 이상 작성해주세요</div>
         </div>
         <div class="form-group">
@@ -352,19 +352,15 @@
         <h3 style="margin-bottom:24px;">&#9989; 최종 확인</h3>
         <p style="margin-bottom:20px;">입력하신 정보를 확인해주세요. 제출 후 모락 팀이 검토하여 승인합니다.</p>
 
-        <div class="complete-info" style="margin-top:0;">
-          <div class="complete-info-row"><span class="complete-info-label">상호명</span><span class="complete-info-value">포항건강도시락</span></div>
-          <div class="complete-info-row"><span class="complete-info-label">사업자번호</span><span class="complete-info-value">123-45-67890</span></div>
-          <div class="complete-info-row"><span class="complete-info-label">대표자</span><span class="complete-info-value">김사장</span></div>
-          <div class="complete-info-row"><span class="complete-info-label">연락처</span><span class="complete-info-value">010-9876-5432</span></div>
-          <div class="complete-info-row"><span class="complete-info-label">주소</span><span class="complete-info-value">포항시 남구 효자동 456-7</span></div>
-          <div class="complete-info-row"><span class="complete-info-label">업종</span><span class="complete-info-value">도시락</span></div>
-          <div class="complete-info-row"><span class="complete-info-label">대표 메뉴</span><span class="complete-info-value">건강 도시락 (6,500원), 저염 도시락 (7,000원)</span></div>
-          <div class="complete-info-row"><span class="complete-info-label">서비스 유형</span><span class="complete-info-value">단체주문, 정기구독</span></div>
-          <div class="complete-info-row"><span class="complete-info-label">배달 지역</span><span class="complete-info-value">남구</span></div>
-          <div class="complete-info-row"><span class="complete-info-label">배달 요일</span><span class="complete-info-value">월~금</span></div>
-          <div class="complete-info-row"><span class="complete-info-label">배달 방식</span><span class="complete-info-value">직접 배달 (3,000원)</span></div>
-          <div class="complete-info-row"><span class="complete-info-label">최소 주문</span><span class="complete-info-value">5인 이상</span></div>
+        <div class="complete-info" style="margin-top:0;" id="summaryBox">
+          <div class="complete-info-row"><span class="complete-info-label">상호명</span><span class="complete-info-value">-</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">사업자번호</span><span class="complete-info-value">-</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">대표자</span><span class="complete-info-value">-</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">연락처</span><span class="complete-info-value">-</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">주소</span><span class="complete-info-value">-</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">업종</span><span class="complete-info-value">-</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">대표 메뉴</span><span class="complete-info-value">-</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">배달 지역</span><span class="complete-info-value">-</span></div>
         </div>
 
         <div style="margin-top:20px;padding:16px;background:var(--yellow-light);border-radius:var(--radius-sm);font-size:0.85rem;color:var(--yellow);">
@@ -389,10 +385,10 @@
           영업일 1~3일 내에 카카오톡으로 결과를 알려드릴게요.
         </p>
         <div class="complete-info">
-          <div class="complete-info-row"><span class="complete-info-label">신청번호</span><span class="complete-info-value">#APPLY-2026-0042</span></div>
-          <div class="complete-info-row"><span class="complete-info-label">상호명</span><span class="complete-info-value">포항건강도시락</span></div>
-          <div class="complete-info-row"><span class="complete-info-label">신청일시</span><span class="complete-info-value">2026.03.30 14:23</span></div>
-          <div class="complete-info-row"><span class="complete-info-label">예상 승인</span><span class="complete-info-value">2026.04.01 ~ 04.02</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">신청번호</span><span class="complete-info-value" id="resultId">-</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">상호명</span><span class="complete-info-value" id="resultStore">-</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">신청일시</span><span class="complete-info-value" id="resultTime">-</span></div>
+          <div class="complete-info-row"><span class="complete-info-label">예상 승인</span><span class="complete-info-value">영업일 1~3일</span></div>
         </div>
 
         <!-- Kakao alert preview -->
@@ -419,14 +415,15 @@
   </div>
 
   <script>
+    const SUPABASE_URL = 'https://uocawtgzmxhveqpumnuc.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_KYRdizMFMdqxaIcpn_ubXA_EAOyszvC';
+
     let currentStep = 1;
 
     function goStep(step) {
-      // Hide all steps
+      if (step === 4) populateSummary();
       document.querySelectorAll('.step-content').forEach(s => s.classList.remove('active'));
       document.getElementById('step-' + step).classList.add('active');
-
-      // Update progress bar
       document.querySelectorAll('.progress-step').forEach((s, i) => {
         s.classList.remove('active', 'done');
         if (i + 1 < step) s.classList.add('done');
@@ -435,15 +432,90 @@
       document.querySelectorAll('.progress-line').forEach((l, i) => {
         l.classList.toggle('done', i + 1 < step);
       });
-
       currentStep = step;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function submitApplication() {
-      goStep(5);
-      // Hide progress bar
-      document.getElementById('progressBar').style.display = 'none';
+    function getFormData() {
+      const menus = [...document.querySelectorAll('#menuList .menu-item')].map(el => ({
+        name: el.querySelector('.menu-item-name').textContent,
+        price: el.querySelector('.menu-item-price').textContent
+      }));
+      const areas = [...document.querySelectorAll('.area-chip.selected')].map(el => el.textContent.trim());
+      const days = [...document.querySelectorAll('.day-chip.selected')].map(el => el.textContent.trim());
+      const serviceTypes = [...document.querySelectorAll('.chip-group .chip.active')].map(el => el.textContent.trim());
+      const deliveryTypes = [...document.querySelectorAll('[onclick*="classList.toggle(\'selected\')"].selected')]
+        .map(el => el.textContent.trim()).filter(t => t.includes('배달'));
+
+      return {
+        store_name: document.getElementById('storeName').value,
+        business_number: document.getElementById('businessNumber').value,
+        owner_name: document.getElementById('ownerName').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+        address: document.getElementById('address').value,
+        category: document.getElementById('category').value,
+        description: document.getElementById('description').value,
+        delivery_fee: parseInt(document.getElementById('deliveryFee').value) || 0,
+        min_order: parseInt(document.getElementById('minOrder').value) || 0,
+        delivery_areas: areas,
+        delivery_days: days,
+        service_types: serviceTypes,
+        menus: menus,
+        subscription_available: serviceTypes.some(t => t.includes('구독')),
+        status: 'pending'
+      };
+    }
+
+    function populateSummary() {
+      const d = getFormData();
+      const rows = document.querySelectorAll('#summaryBox .complete-info-row .complete-info-value');
+      if (rows.length < 8) return;
+      rows[0].textContent = d.store_name;
+      rows[1].textContent = d.business_number;
+      rows[2].textContent = d.owner_name;
+      rows[3].textContent = d.phone;
+      rows[4].textContent = d.address;
+      rows[5].textContent = d.category;
+      rows[6].textContent = d.menus.map(m => `${m.name} (${m.price})`).join(', ') || '-';
+      rows[7].textContent = d.delivery_areas.join(', ') || '-';
+    }
+
+    async function submitApplication() {
+      const btn = document.querySelector('#step-4 .btn-primary');
+      btn.disabled = true;
+      btn.textContent = '제출 중...';
+
+      const data = getFormData();
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/store_applications`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation'
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.message || '제출 실패');
+
+        const id = result[0]?.id || '-';
+        const now = new Date().toLocaleString('ko-KR');
+        document.getElementById('resultId').textContent = `#APPLY-${String(id).padStart(4, '0')}`;
+        document.getElementById('resultStore').textContent = data.store_name;
+        document.getElementById('resultTime').textContent = now;
+
+        goStep(5);
+        document.getElementById('progressBar').style.display = 'none';
+      } catch (e) {
+        btn.disabled = false;
+        btn.textContent = '🚀 입점 신청 제출하기';
+        alert('제출 중 오류가 발생했습니다: ' + e.message);
+      }
     }
 
     // File upload preview

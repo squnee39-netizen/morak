@@ -384,10 +384,132 @@
   <div class="admin-toast" id="adminToast"></div>
 
   <script>
+    const SUPABASE_URL = 'https://uocawtgzmxhveqpumnuc.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_KYRdizMFMdqxaIcpn_ubXA_EAOyszvC';
+
     let currentRejectId = null;
     let currentRejectName = '';
 
-    // Panel navigation
+    async function sbFetch(method, query, body) {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/store_applications${query}`, {
+        method,
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: body ? JSON.stringify(body) : undefined
+      });
+      return res.json();
+    }
+
+    async function loadApplications() {
+      const [pending, approved, rejected] = await Promise.all([
+        sbFetch('GET', '?status=eq.pending&order=created_at.desc'),
+        sbFetch('GET', '?status=eq.approved&order=created_at.desc'),
+        sbFetch('GET', '?status=eq.rejected&order=created_at.desc'),
+      ]);
+
+      document.getElementById('statPending').textContent = pending.length || 0;
+      document.getElementById('statApproved').textContent = approved.length || 0;
+      document.getElementById('statRejected').textContent = rejected.length || 0;
+      document.getElementById('statTotal').textContent = (approved.length || 0);
+      document.getElementById('pendingCount').textContent = pending.length || 0;
+
+      renderApplications(pending);
+      renderApproved(approved);
+      renderRejected(rejected);
+    }
+
+    function renderApplications(list) {
+      const el = document.getElementById('applicationList');
+      if (!list.length) {
+        el.innerHTML = `<div style="text-align:center;padding:60px 0;color:var(--gray-500);">
+          <div style="font-size:2.5rem;margin-bottom:12px;">📋</div>
+          <div style="font-weight:600;">대기 중인 입점 신청이 없습니다</div>
+        </div>`;
+        return;
+      }
+      el.innerHTML = list.map(app => `
+        <div class="app-card" id="app-${app.id}">
+          <div class="app-card-header" onclick="toggleCard('app-${app.id}')">
+            <div class="app-card-left">
+              <div class="app-card-avatar">🏪</div>
+              <div>
+                <div class="app-card-name">${app.store_name}</div>
+                <div class="app-card-meta">${app.category || '-'} · ${(app.delivery_areas||[]).join(', ')} · ${app.owner_name || '-'}</div>
+              </div>
+            </div>
+            <div class="app-card-right">
+              <span class="badge badge-orange">대기중</span>
+              <span class="app-card-time">${new Date(app.created_at).toLocaleDateString('ko-KR')}</span>
+            </div>
+          </div>
+          <div class="app-card-detail">
+            <div class="detail-grid">
+              <div class="detail-item"><div class="detail-label">상호명</div><div class="detail-value">${app.store_name}</div></div>
+              <div class="detail-item"><div class="detail-label">사업자번호</div><div class="detail-value">${app.business_number || '-'}</div></div>
+              <div class="detail-item"><div class="detail-label">대표자</div><div class="detail-value">${app.owner_name || '-'}</div></div>
+              <div class="detail-item"><div class="detail-label">연락처</div><div class="detail-value">${app.phone || '-'}</div></div>
+              <div class="detail-item"><div class="detail-label">이메일</div><div class="detail-value">${app.email || '-'}</div></div>
+              <div class="detail-item"><div class="detail-label">주소</div><div class="detail-value">${app.address || '-'}</div></div>
+              <div class="detail-item detail-full"><div class="detail-label">소개</div><div class="detail-value" style="line-height:1.6;">${app.description || '-'}</div></div>
+              <div class="detail-item detail-full"><div class="detail-label">대표 메뉴</div><div class="detail-value">${(app.menus||[]).map(m=>`${m.name} (${m.price})`).join(', ') || '-'}</div></div>
+              <div class="detail-item"><div class="detail-label">서비스 유형</div><div class="detail-tags">${(app.service_types||[]).map(t=>`<span class="detail-tag">${t}</span>`).join('')}</div></div>
+              <div class="detail-item detail-full"><div class="detail-label">배달 지역</div><div class="detail-tags">${(app.delivery_areas||[]).map(a=>`<span class="detail-tag">${a}</span>`).join('')}</div></div>
+              <div class="detail-item"><div class="detail-label">배달 요일</div><div class="detail-value">${(app.delivery_days||[]).join(', ') || '-'}</div></div>
+              <div class="detail-item"><div class="detail-label">최소 주문</div><div class="detail-value">${app.min_order ? app.min_order + '인 이상' : '-'}</div></div>
+            </div>
+            <div class="detail-actions">
+              <button class="btn btn-success" onclick="approveApp(${app.id}, '${app.store_name}')">✅ 승인하기</button>
+              <button class="btn btn-danger" onclick="rejectApp(${app.id}, '${app.store_name}')">❌ 거절하기</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderApproved(list) {
+      const el = document.getElementById('approvedList');
+      if (!list.length) {
+        el.innerHTML = `<div style="text-align:center;padding:60px 0;color:var(--gray-500);"><div style="font-size:2.5rem;margin-bottom:12px;">🏪</div><div style="font-weight:600;">승인된 상점이 없습니다</div></div>`;
+        return;
+      }
+      el.innerHTML = list.map(app => `
+        <div class="status-card">
+          <div class="status-card-left">
+            <div class="app-card-avatar" style="width:36px;height:36px;font-size:1rem;">🏪</div>
+            <div>
+              <div class="status-card-name">${app.store_name}</div>
+              <div class="status-card-meta">${app.category || '-'} · 승인일: ${new Date(app.created_at).toLocaleDateString('ko-KR')}</div>
+            </div>
+          </div>
+          <span class="badge badge-green">운영중</span>
+        </div>
+      `).join('');
+    }
+
+    function renderRejected(list) {
+      const el = document.getElementById('rejectedList');
+      if (!list.length) {
+        el.innerHTML = `<div style="text-align:center;padding:60px 0;color:var(--gray-500);"><div style="font-size:2.5rem;margin-bottom:12px;">📭</div><div style="font-weight:600;">거절 내역이 없습니다</div></div>`;
+        return;
+      }
+      el.innerHTML = list.map(app => `
+        <div class="status-card">
+          <div class="status-card-left">
+            <div class="app-card-avatar" style="width:36px;height:36px;font-size:1rem;">🏪</div>
+            <div>
+              <div class="status-card-name">${app.store_name}</div>
+              <div class="status-card-meta">거절일: ${new Date(app.created_at).toLocaleDateString('ko-KR')}</div>
+            </div>
+          </div>
+          <span class="badge badge-red">거절됨</span>
+        </div>
+      `).join('');
+    }
+
     function showAdminPanel(name, btn) {
       document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
       document.getElementById('panel-' + name).classList.add('active');
@@ -395,42 +517,20 @@
       btn.classList.add('active');
     }
 
-    // Toggle card expand
     function toggleCard(id) {
-      const card = document.getElementById(id);
-      card.classList.toggle('expanded');
+      document.getElementById(id).classList.toggle('expanded');
     }
 
-    // Approve
-    function approveApp(id, name) {
-      const card = document.getElementById(id);
+    async function approveApp(id, name) {
+      await sbFetch('PATCH', `?id=eq.${id}`, { status: 'approved' });
+      const card = document.getElementById('app-' + id);
       card.style.transition = 'all 0.5s ease';
       card.style.transform = 'translateX(100%)';
       card.style.opacity = '0';
-      setTimeout(() => {
-        card.remove();
-        updatePendingCount();
-        // Add to approved list
-        const approvedList = document.getElementById('approvedList');
-        const item = document.createElement('div');
-        item.className = 'status-card';
-        item.style.animation = 'fadeIn 0.3s ease';
-        item.innerHTML = `
-          <div class="status-card-left">
-            <div class="app-card-avatar" style="width:36px;height:36px;font-size:1rem;">&#127881;</div>
-            <div>
-              <div class="status-card-name">${name}</div>
-              <div class="status-card-meta">방금 승인됨</div>
-            </div>
-          </div>
-          <span class="badge badge-green">운영중</span>
-        `;
-        approvedList.prepend(item);
-      }, 500);
-      showAdminToast('&#9989; ' + name + ' 승인 완료! 사장님에게 카톡 알림이 전송됩니다.', 'var(--green)');
+      setTimeout(() => loadApplications(), 500);
+      showAdminToast('✅ ' + name + ' 승인 완료!', 'var(--green)');
     }
 
-    // Reject
     function rejectApp(id, name) {
       currentRejectId = id;
       currentRejectName = name;
@@ -448,26 +548,19 @@
       el.querySelector('input').checked = true;
     }
 
-    function confirmAdminReject() {
+    async function confirmAdminReject() {
       closeAdminReject();
-      const card = document.getElementById(currentRejectId);
-      card.style.transition = 'all 0.5s ease';
-      card.style.transform = 'translateX(-100%)';
-      card.style.opacity = '0';
-      setTimeout(() => {
-        card.remove();
-        updatePendingCount();
-      }, 500);
-      showAdminToast('&#10060; ' + currentRejectName + ' 거절 완료. 사장님에게 카톡 알림이 전송됩니다.', 'var(--red)');
+      await sbFetch('PATCH', `?id=eq.${currentRejectId}`, { status: 'rejected' });
+      const card = document.getElementById('app-' + currentRejectId);
+      if (card) {
+        card.style.transition = 'all 0.5s ease';
+        card.style.transform = 'translateX(-100%)';
+        card.style.opacity = '0';
+      }
+      setTimeout(() => loadApplications(), 500);
+      showAdminToast('❌ ' + currentRejectName + ' 거절 완료.', 'var(--red)');
     }
 
-    function updatePendingCount() {
-      const remaining = document.querySelectorAll('#applicationList .app-card').length;
-      document.getElementById('pendingCount').textContent = remaining;
-      document.getElementById('statPending').textContent = remaining;
-    }
-
-    // Toast
     function showAdminToast(msg, color) {
       const toast = document.getElementById('adminToast');
       toast.innerHTML = msg;
@@ -475,6 +568,8 @@
       toast.style.bottom = '32px';
       setTimeout(() => { toast.style.bottom = '-80px'; }, 3000);
     }
+
+    document.addEventListener('DOMContentLoaded', loadApplications);
   </script>
 
   <style>

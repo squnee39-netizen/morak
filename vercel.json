@@ -1,20 +1,8 @@
 {
   "version": 2,
   "name": "morak",
-  "builds": [
-    {
-      "src": "**/*",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    { "src": "/", "dest": "/index.html" },
-    { "src": "/customer", "dest": "/customer.html" },
-    { "src": "/store", "dest": "/store.html" },
-    { "src": "/store-register", "dest": "/store-register.html" },
-    { "src": "/admin", "dest": "/admin.html" },
-    { "src": "/(.*)", "dest": "/$1" }
-  ],
+  "cleanUrls": true,
+  "trailingSlash": false,
   "headers": [
     {
       "source": "/(.*)",
