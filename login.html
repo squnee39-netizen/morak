@@ -135,7 +135,10 @@
     async function kakaoLogin() {
       await sb.auth.signInWithOAuth({
         provider: 'kakao',
-        options: { redirectTo: window.location.origin + '/customer' }
+        options: {
+          redirectTo: window.location.origin + '/customer',
+          scopes: 'profile_nickname profile_image'
+        }
       });
     }
 
