@@ -161,11 +161,10 @@
           throw new Error('ID 토큰을 받지 못했습니다: ' + JSON.stringify(tokenData));
         }
 
-        // Supabase에 ID 토큰으로 로그인 (nonce 포함)
+        // Supabase에 ID 토큰으로 로그인
         const { error } = await sb.auth.signInWithIdToken({
           provider: 'kakao',
-          token: tokenData.id_token,
-          nonce: sessionStorage.getItem('kakao_nonce') || undefined
+          token: tokenData.id_token
         });
 
         if (error) throw new Error(error.message);
@@ -185,14 +184,11 @@
     }
 
     function kakaoLogin() {
-      const nonce = Math.random().toString(36).substring(2);
-      sessionStorage.setItem('kakao_nonce', nonce);
       const params = new URLSearchParams({
         response_type: 'code',
         client_id: KAKAO_REST_KEY,
         redirect_uri: KAKAO_REDIRECT_URI,
-        scope: 'openid profile_nickname profile_image',
-        nonce: nonce
+        scope: 'openid profile_nickname profile_image'
       });
       location.href = 'https://kauth.kakao.com/oauth/authorize?' + params;
     }
