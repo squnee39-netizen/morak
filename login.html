@@ -161,10 +161,11 @@
           throw new Error('ID 토큰을 받지 못했습니다: ' + JSON.stringify(tokenData));
         }
 
-        // Supabase에 ID 토큰으로 로그인
+        // Supabase에 ID 토큰으로 로그인 (nonce 포함)
         const { error } = await sb.auth.signInWithIdToken({
           provider: 'kakao',
-          token: tokenData.id_token
+          token: tokenData.id_token,
+          nonce: sessionStorage.getItem('kakao_nonce') || undefined
         });
 
         if (error) throw new Error(error.message);
