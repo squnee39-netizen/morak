@@ -120,10 +120,61 @@
     const { createClient } = supabase;
     const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    const KAKAO_REST_KEY = '872585f73e87ba73a50282774ef4ab4d';
+    const KAKAO_REDIRECT_URI = 'https://morak-ten.vercel.app/login';
+
     // 이미 로그인된 경우 리다이렉트
     sb.auth.getSession().then(({ data: { session } }) => {
-      if (session) redirectByRole(session.access_token);
+      if (session) redirectByRole();
     });
+
+    // 카카오 OAuth 콜백 처리 (code 파라미터가 있을 때)
+    (async function handleKakaoCallback() {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      if (!code) return;
+
+      // URL에서 code 제거
+      window.history.replaceState({}, '', '/login');
+
+      const err = document.getElementById('loginError');
+      err.textContent = '카카오 로그인 처리 중...';
+      err.style.display = 'block';
+      err.style.background = '#EFF6FF';
+      err.style.color = '#1D4ED8';
+
+      try {
+        // 카카오 token 엔드포인트에서 id_token 획득
+        const tokenRes = await fetch('https://kauth.kakao.com/oauth/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' },
+          body: new URLSearchParams({
+            grant_type: 'authorization_code',
+            client_id: KAKAO_REST_KEY,
+            redirect_uri: KAKAO_REDIRECT_URI,
+            code: code
+          })
+        });
+        const tokenData = await tokenRes.json();
+
+        if (!tokenData.id_token) {
+          throw new Error('ID 토큰을 받지 못했습니다: ' + JSON.stringify(tokenData));
+        }
+
+        // Supabase에 ID 토큰으로 로그인
+        const { error } = await sb.auth.signInWithIdToken({
+          provider: 'kakao',
+          token: tokenData.id_token
+        });
+
+        if (error) throw new Error(error.message);
+        await redirectByRole();
+      } catch (e) {
+        err.textContent = '카카오 로그인 오류: ' + e.message;
+        err.style.background = '#FEF2F2';
+        err.style.color = '#DC2626';
+      }
+    })();
 
     function switchTab(tab, btn) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -132,17 +183,20 @@
       document.getElementById('panel-' + tab).classList.add('active');
     }
 
-    async function kakaoLogin() {
-      await sb.auth.signInWithOAuth({
-        provider: 'kakao',
-        options: {
-          redirectTo: window.location.origin + '/customer',
-          scopes: 'profile_nickname profile_image'
-        }
+    function kakaoLogin() {
+      const nonce = Math.random().toString(36).substring(2);
+      sessionStorage.setItem('kakao_nonce', nonce);
+      const params = new URLSearchParams({
+        response_type: 'code',
+        client_id: KAKAO_REST_KEY,
+        redirect_uri: KAKAO_REDIRECT_URI,
+        scope: 'openid profile_nickname profile_image',
+        nonce: nonce
       });
+      location.href = 'https://kauth.kakao.com/oauth/authorize?' + params;
     }
 
-    async function redirectByRole(token) {
+    async function redirectByRole() {
       const { data } = await sb.from('user_profiles').select('role, store_id').single();
       const role = data?.role || 'customer';
       if (role === 'admin') location.href = '/admin';
