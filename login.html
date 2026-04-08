@@ -168,6 +168,17 @@
         });
 
         if (error) throw new Error(error.message);
+
+        // 사장님 카카오 알림용 토큰 저장
+        const { data: { session: newSession } } = await sb.auth.getSession();
+        if (newSession && tokenData.access_token) {
+          await sb.from('user_profiles').upsert({
+            id: newSession.user.id,
+            kakao_access_token: tokenData.access_token,
+            kakao_refresh_token: tokenData.refresh_token || null
+          }, { onConflict: 'id' });
+        }
+
         await redirectByRole();
       } catch (e) {
         err.textContent = '카카오 로그인 오류: ' + e.message;
@@ -188,7 +199,7 @@
         response_type: 'code',
         client_id: KAKAO_REST_KEY,
         redirect_uri: KAKAO_REDIRECT_URI,
-        scope: 'openid profile_nickname profile_image'
+        scope: 'openid profile_nickname profile_image talk_message'
       });
       location.href = 'https://kauth.kakao.com/oauth/authorize?' + params;
     }

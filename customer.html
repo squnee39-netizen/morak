@@ -7,6 +7,15 @@
   <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // 고객 인증 가드 - 로그인 필요
+    (async () => {
+      const sb = supabase.createClient('https://uocawtgzmxhveqpumnuc.supabase.co','sb_publishable_KYRdizMFMdqxaIcpn_ubXA_EAOyszvC');
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { location.href = '/login'; return; }
+      document.getElementById('auth-loading').style.display = 'none';
+    })();
+  </script>
   <style>
     body { padding-top: 64px; background: var(--cream); }
 
@@ -166,6 +175,7 @@
   </style>
 </head>
 <body>
+  <div id="auth-loading" style="position:fixed;inset:0;background:var(--cream);display:flex;align-items:center;justify-content:center;z-index:9999;font-size:1.5rem;">~</div>
   <!-- Nav -->
   <nav class="nav scrolled">
     <div class="nav-inner">
@@ -414,17 +424,17 @@
         <div class="grid-2">
           <div class="form-group">
             <label class="form-label">배달 날짜</label>
-            <input class="form-input" type="date" value="2026-03-31">
+            <input class="form-input" type="date" id="deliveryDate" value="2026-03-31">
             <div class="form-hint">최소 3일 전 예약 필수</div>
           </div>
           <div class="form-group">
             <label class="form-label">배달 시간</label>
-            <input class="form-input" type="time" value="12:00">
+            <input class="form-input" type="time" id="deliveryTime" value="12:00">
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">배달 주소</label>
-          <input class="form-input" value="포항시 남구 효자동 123-4 포항테크빌딩 3층">
+          <input class="form-input" id="deliveryAddress" value="포항시 남구 효자동 123-4 포항테크빌딩 3층">
         </div>
         <div class="form-group">
           <label class="form-label">배달 방식</label>
@@ -589,6 +599,7 @@
     }
 
     let stores = [];
+    let currentStoreIdx = null;
     let activeCat = '전체';
     let activeArea = '전체';
 
@@ -762,6 +773,7 @@
 
     // Order Modal
     function openOrderModal(idx) {
+      currentStoreIdx = idx;
       const store = stores[idx];
       document.getElementById('modalStoreName').textContent = store.name;
       document.getElementById('orderModal').classList.add('show');
@@ -782,7 +794,48 @@
       document.getElementById('summaryTotal').textContent = (total + 3000).toLocaleString() + '원';
     }
 
-    function submitOrder() {
+    async function submitOrder() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { location.href = '/login'; return; }
+
+      const btn = document.querySelector('#orderModal .btn-primary');
+      btn.disabled = true;
+      btn.textContent = '주문 처리 중...';
+
+      const store = stores[currentStoreIdx];
+      const price = parseInt(document.getElementById('menuSelect').value);
+      const qty = parseInt(document.getElementById('qtyInput').value) || 1;
+      const menuName = document.getElementById('menuSelect').selectedOptions[0].text.split('(')[0].trim();
+
+      const { data: order, error } = await sb.from('orders').insert({
+        store_id: store.id,
+        customer_id: session.user.id,
+        menu_name: menuName,
+        quantity: qty,
+        menu_price: price,
+        total_price: price * qty + 3000,
+        delivery_date: document.getElementById('deliveryDate').value,
+        delivery_time: document.getElementById('deliveryTime').value,
+        delivery_address: document.getElementById('deliveryAddress').value,
+        note: document.querySelector('#orderModal textarea')?.value || '',
+        status: 'pending'
+      }).select().single();
+
+      btn.disabled = false;
+      btn.textContent = '주문 요청하기';
+
+      if (error) {
+        alert('주문 실패: ' + error.message);
+        return;
+      }
+
+      // 카카오 알림 전송 (백그라운드)
+      fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_id: order.id })
+      });
+
       closeOrderModal();
       document.getElementById('successModal').classList.add('show');
       document.body.style.overflow = 'hidden';

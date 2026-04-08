@@ -14,7 +14,8 @@
       const { data: { session } } = await sb.auth.getSession();
       if (!session) { location.href = '/login'; return; }
       const { data: profile } = await sb.from('user_profiles').select('role').eq('id', session.user.id).single();
-      if (!profile || profile.role !== 'admin') { location.href = '/login'; }
+      if (!profile || profile.role !== 'admin') { location.href = '/login'; return; }
+      document.getElementById('auth-loading').style.display = 'none';
     })();
   </script>
   <style>
@@ -150,6 +151,7 @@
   </style>
 </head>
 <body>
+  <div id="auth-loading" style="position:fixed;inset:0;background:#0F0F0F;display:flex;align-items:center;justify-content:center;z-index:9999;font-size:1.5rem;color:var(--orange);">~</div>
   <!-- Nav -->
   <nav class="nav scrolled">
     <div class="nav-inner">
