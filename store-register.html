@@ -414,9 +414,20 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = 'https://uocawtgzmxhveqpumnuc.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_KYRdizMFMdqxaIcpn_ubXA_EAOyszvC';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // 로그인 확인 - 비로그인 시 로그인 페이지로
+    (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) {
+        alert('파트너 신청은 카카오 로그인 후 가능합니다.');
+        location.href = '/login';
+      }
+    })();
 
     let currentStep = 1;
 
@@ -498,6 +509,9 @@
     }
 
     async function submitApplication() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { alert('카카오 로그인이 필요합니다.'); location.href = '/login'; return; }
+
       const btn = document.querySelector('#step-4 .btn-primary');
       btn.disabled = true;
       btn.textContent = '제출 중...';
@@ -512,6 +526,7 @@
       }
 
       btn.textContent = '제출 중...';
+      data.user_id = session.user.id;
 
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/store_applications`, {

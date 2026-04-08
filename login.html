@@ -169,14 +169,23 @@
 
         if (error) throw new Error(error.message);
 
-        // 사장님 카카오 알림용 토큰 저장
+        // 신규 유저 → customer로 자동 등록, 기존 유저 → 토큰만 갱신
         const { data: { session: newSession } } = await sb.auth.getSession();
-        if (newSession && tokenData.access_token) {
-          await sb.from('user_profiles').upsert({
-            id: newSession.user.id,
-            kakao_access_token: tokenData.access_token,
-            kakao_refresh_token: tokenData.refresh_token || null
-          }, { onConflict: 'id' });
+        if (newSession) {
+          const { data: existing } = await sb.from('user_profiles').select('id').eq('id', newSession.user.id).single();
+          if (!existing) {
+            await sb.from('user_profiles').insert({
+              id: newSession.user.id,
+              role: 'customer',
+              kakao_access_token: tokenData.access_token || null,
+              kakao_refresh_token: tokenData.refresh_token || null
+            });
+          } else if (tokenData.access_token) {
+            await sb.from('user_profiles').update({
+              kakao_access_token: tokenData.access_token,
+              kakao_refresh_token: tokenData.refresh_token || null
+            }).eq('id', newSession.user.id);
+          }
         }
 
         await redirectByRole();
