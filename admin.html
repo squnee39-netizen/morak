@@ -10,6 +10,11 @@
   <script>
     // 관리자 ID/PW 인증 가드
     (async () => {
+      // DOM 준비 대기
+      if (document.readyState === 'loading') {
+        await new Promise(r => document.addEventListener('DOMContentLoaded', r));
+      }
+
       const ADMIN_ID = 'squnee';
       const ADMIN_PW_HASH = '932632223da8d70676ab0467705f0025e4a694ab9394304a17b5697cba2267ed';
 
