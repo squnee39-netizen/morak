@@ -16,12 +16,7 @@
       }
 
       const ADMIN_ID = 'squnee';
-      const ADMIN_PW_HASH = '932632223da8d70676ab0467705f0025e4a694ab9394304a17b5697cba2267ed';
-
-      async function sha256(str) {
-        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-      }
+      const ADMIN_PW = 'dkdlvhs12!';
 
       // 이미 로그인된 세션이면 바로 통과
       if (sessionStorage.getItem('admin_auth') === 'true') {
@@ -53,11 +48,10 @@
 
       document.addEventListener('keydown', e => { if (e.key === 'Enter') doAdminLogin(); });
 
-      window.doAdminLogin = async function() {
+      window.doAdminLogin = function() {
         const id = document.getElementById('adminId').value.trim();
         const pw = document.getElementById('adminPw').value;
-        const hash = await sha256(pw);
-        if (id === ADMIN_ID && hash === ADMIN_PW_HASH) {
+        if (id === ADMIN_ID && pw === ADMIN_PW) {
           sessionStorage.setItem('admin_auth', 'true');
           document.getElementById('auth-loading').style.display = 'none';
         } else {
